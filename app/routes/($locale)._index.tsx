@@ -6,6 +6,7 @@ import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
+import {FlipWords} from '~/components/ui/flip-words';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -57,10 +58,11 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  const words = [' SALTY', ' ELEGANT', ' BOLD'];
   return (
     <>
       {/* Hero Section with Video */}
-      <section className="relative h-screen w-full">
+      <section className="relative h-screen w-full font-poppins">
         <video
           autoPlay
           loop
@@ -74,10 +76,9 @@ export default function Homepage() {
         <div className="absolute inset-0 bg-black/30"></div>
 
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center justify-center h-full">
-          <h1 className="text-white text-4xl md:text-6xl font-bold">
-            Your Hero Text
-          </h1>
+        <div className="absolute bottom-20 left-10 text-6xl font-bold text-white">
+          KEEP IT
+          <FlipWords words={words} /> <br />
         </div>
       </section>
 

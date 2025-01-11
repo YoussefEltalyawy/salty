@@ -18,12 +18,17 @@
     "@remix-run/server-runtime": "^2.13.1",
     "@shopify/hydrogen": "2024.10.1",
     "@shopify/remix-oxygen": "^2.0.9",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.17.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^3.8.0",
     "lucide-react": "^0.471.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.2",

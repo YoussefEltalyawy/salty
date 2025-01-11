@@ -58,7 +58,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
-  const words = [' SALTY', ' ELEGANT', ' BOLD'];
+  const words = ['SALTY', 'ELEGANT', 'BOLD'];
   return (
     <>
       {/* Hero Section with Video */}
@@ -75,9 +75,15 @@ export default function Homepage() {
         {/* Optional: Overlay */}
         <div className="absolute inset-0 bg-black/30"></div>
 
-        {/* Hero Content */}
-        <div className="absolute bottom-20 left-10 text-6xl font-bold text-white">
-          KEEP IT
+        {/* Desktop/Tablet Version */}
+        <div className="hidden md:block absolute bottom-20 left-10 text-6xl font-bold text-white">
+          <p className="inline mr-4">KEEP IT</p>
+          <FlipWords words={words} /> <br />
+        </div>
+
+        {/* Mobile Version */}
+        <div className="md:hidden absolute bottom-20 left-10 text-6xl font-bold text-white">
+          <p className="mb-0">KEEP IT</p>
           <FlipWords words={words} /> <br />
         </div>
       </section>

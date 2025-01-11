@@ -7,7 +7,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import {Menu, Search} from 'lucide-react';
+import {Menu, Search, ShoppingBag, User} from 'lucide-react';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -18,7 +18,7 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-// this is header component.
+// Header Component
 export function Header({
   header,
   isLoggedIn,
@@ -26,42 +26,40 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
-  const {type: asideType} = useAside(); //where sidecards live
+  const {type: asideType} = useAside();
+
   return (
     <header
       className="flex items-center justify-between px-8 py-6 text-white 
-      fixed top-0 left-0 right-0 
-      bg-transparent backdrop-blur-sm
-      z-10 transition-all duration-300"
+        fixed top-0 left-0 right-0 
+        bg-transparent backdrop-blur-sm 
+        z-10 transition-all duration-300"
     >
-      {/* Mobile hamburger menu */}
-      <div className="lg:hidden">
+      {/* Hamburger Menu and User Section */}
+      <div className="flex items-center space-x-4">
         <HeaderMenuMobileToggle />
-      </div>
-      {/* Desktop/Tablet hamburger menu */}
-      <div className="hidden lg:block">
-        <HeaderMenuMobileToggle />
+        <User className="text-2xl lg:text-3xl" />
       </div>
 
-      {/* Mobile Logo */}
-      <div className="flex md:hidden items-center justify-center">
-        <img src="/logo.png" alt="Logo" className="w-16 h-16" />
+      {/* Logo */}
+      <div className="flex items-center justify-center flex-1">
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20"
+        />
       </div>
 
-      {/* Desktop/Tablet Logo */}
-      <div className="hidden md:flex items-center justify-center">
-        <img src="/logo.png" alt="Logo" className="w-20 h-20" />
-      </div>
-
-      {/* Right - Search, Profile, and Cart */}
-      <div className="flex items-center space-x-4 text-2xl">
+      {/* Right Section - Icons */}
+      <div className="flex items-center space-x-4">
         <SearchToggle />
-        {/* Other icons here */}
+        <CartToggle cart={cart} />
       </div>
     </header>
   );
 }
 
+// Header Menu Component
 export function HeaderMenu({
   menu,
   primaryDomainUrl,
@@ -92,13 +90,13 @@ export function HeaderMenu({
       {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
         if (!item.url) return null;
 
-        // if the url is internal, we strip the domain
         const url =
           item.url.includes('myshopify.com') ||
           item.url.includes(publicStoreDomain) ||
           item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
             : item.url;
+
         return (
           <NavLink
             className="header-menu-item"
@@ -117,6 +115,7 @@ export function HeaderMenu({
   );
 }
 
+// Header Call-to-Actions
 function HeaderCtas({
   isLoggedIn,
   cart,
@@ -137,6 +136,7 @@ function HeaderCtas({
   );
 }
 
+// Mobile Menu Toggle
 function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
@@ -149,6 +149,7 @@ function HeaderMenuMobileToggle() {
   );
 }
 
+// Search Toggle
 function SearchToggle() {
   const {open} = useAside();
   return (
@@ -158,6 +159,7 @@ function SearchToggle() {
   );
 }
 
+// Cart Badge
 function CartBadge({count}: {count: number | null}) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
@@ -175,12 +177,19 @@ function CartBadge({count}: {count: number | null}) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
+      className="relative inline-flex items-center"
     >
-      Cart {count === null ? <span>&nbsp;</span> : count}
+      <ShoppingBag size={24} />
+      {count !== null && (
+        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#BEB1A1] text-xs text-white">
+          {count}
+        </span>
+      )}
     </a>
   );
 }
 
+// Cart Toggle
 function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   return (
     <Suspense fallback={<CartBadge count={null} />}>
@@ -191,12 +200,14 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   );
 }
 
+// Cart Banner
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
   const cart = useOptimisticCart(originalCart);
   return <CartBadge count={cart?.totalQuantity ?? 0} />;
 }
 
+// Fallback Menu
 const FALLBACK_HEADER_MENU = {
   id: 'gid://shopify/Menu/199655587896',
   items: [
@@ -239,6 +250,7 @@ const FALLBACK_HEADER_MENU = {
   ],
 };
 
+// Active Link Style
 function activeLinkStyle({
   isActive,
   isPending,

@@ -7,6 +7,9 @@
   --color-dark: #000;
   --color-light: #fff;
 }
+html {
+  scroll-behavior: smooth;
+}
 
 img {
   border-radius: 4px;

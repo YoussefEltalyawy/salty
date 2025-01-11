@@ -73,8 +73,7 @@ export default function Homepage() {
           <source src="/hero.mp4" type="video/mp4" />
         </video>
         {/* Optional: Overlay */}
-        <div className="absolute inset-0 bg-black/30"></div>
-
+        <div className="absolute inset-0 bg-black/40"></div>
         {/* Desktop/Tablet Version */}
         <div className="hidden md:block absolute bottom-20 left-10 text-6xl font-bold text-white">
           <p className="inline mr-4">KEEP IT</p>
@@ -85,6 +84,21 @@ export default function Homepage() {
         <div className="md:hidden absolute bottom-20 left-10 text-6xl font-bold text-white">
           <p className="mb-0">KEEP IT</p>
           <FlipWords words={words} /> <br />
+        </div>
+        <div className="hidden md:inline-block absolute bottom-20 right-10">
+          <div className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer border border-[#BEB1A1] py-2 px-4 rounded-full">
+            <Link
+              to="#recommended-products"
+              className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer"
+            >
+              <p className="font-light tracking-wider text-m italic">
+                Discover more
+              </p>
+              <span className="transform transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -124,7 +138,7 @@ function RecommendedProducts({
   products: Promise<RecommendedProductsQuery | null>;
 }) {
   return (
-    <div className="recommended-products">
+    <div id="recommended-products">
       <h2 className="text-red-500 text-3xl font-poppins">
         Recommended Products
       </h2>

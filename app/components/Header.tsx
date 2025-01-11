@@ -7,6 +7,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {Menu, Search} from 'lucide-react';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
+// this is header component.
 export function Header({
   header,
   isLoggedIn,
@@ -24,18 +26,38 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
+  const {type: asideType} = useAside(); //where sidecards live
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+    <header
+      className="flex items-center justify-between px-8 py-6 text-white 
+      fixed top-0 left-0 right-0 
+      bg-transparent backdrop-blur-sm
+      z-10 transition-all duration-300"
+    >
+      {/* Mobile hamburger menu */}
+      <div className="lg:hidden">
+        <HeaderMenuMobileToggle />
+      </div>
+      {/* Desktop/Tablet hamburger menu */}
+      <div className="hidden lg:block">
+        <HeaderMenuMobileToggle />
+      </div>
+
+      {/* Mobile Logo */}
+      <div className="flex md:hidden items-center justify-center">
+        <img src="/logo.png" alt="Logo" className="w-16 h-16" />
+      </div>
+
+      {/* Desktop/Tablet Logo */}
+      <div className="hidden md:flex items-center justify-center">
+        <img src="/logo.png" alt="Logo" className="w-20 h-20" />
+      </div>
+
+      {/* Right - Search, Profile, and Cart */}
+      <div className="flex items-center space-x-4 text-2xl">
+        <SearchToggle />
+        {/* Other icons here */}
+      </div>
     </header>
   );
 }
@@ -119,10 +141,10 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className="header-menu-mobile-toggle reset"
+      className="p-2 -ml-2 hover:text-white/80 transition-opacity"
       onClick={() => open('mobile')}
     >
-      <h3>☰</h3>
+      <Menu className="w-6 h-6 lg:w-7 lg:h-7" />
     </button>
   );
 }
@@ -131,7 +153,7 @@ function SearchToggle() {
   const {open} = useAside();
   return (
     <button className="reset" onClick={() => open('search')}>
-      Search
+      <Search className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
     </button>
   );
 }

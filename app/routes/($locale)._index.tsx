@@ -58,10 +58,34 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
-    <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
-    </div>
+    <>
+      {/* Hero Section with Video */}
+      <section className="relative h-screen w-full">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover"
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+        {/* Optional: Overlay */}
+        <div className="absolute inset-0 bg-black/30"></div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 flex items-center justify-center h-full">
+          <h1 className="text-white text-4xl md:text-6xl font-bold">
+            Your Hero Text
+          </h1>
+        </div>
+      </section>
+
+      {/* Other Sections */}
+      <div>
+        <RecommendedProducts products={data.recommendedProducts} />
+      </div>
+    </>
   );
 }
 

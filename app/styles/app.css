@@ -36,6 +36,7 @@ aside {
   position: fixed;
   right: calc(-1 * var(--aside-width));
   top: 0;
+  z-index: 10;
   transition: transform 200ms ease-in-out;
 }
 
@@ -97,7 +98,7 @@ aside li {
   transition: opacity 400ms ease-in-out;
   transition: opacity 400ms;
   visibility: hidden;
-  z-index: 10;
+  z-index: 20;
 }
 
 .overlay .close-outside {
@@ -157,16 +158,16 @@ button.reset:hover:not(:has(> *)) {
 * components/Header
 * --------------------------------------------------
 */
-.header {
+/* .header {
   align-items: center;
-  background: #fff;
+  background: transparent;
   display: flex;
   height: var(--header-height);
   padding: 0 1rem;
   position: sticky;
   top: 0;
   z-index: 1;
-}
+} */
 
 .header-menu-mobile-toggle {
   @media (min-width: 48em) {

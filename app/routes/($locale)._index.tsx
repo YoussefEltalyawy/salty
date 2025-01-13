@@ -148,22 +148,22 @@ function RecommendedProducts({
           <motion.div
             initial={{x: '50%', opacity: 0}}
             animate={springControls}
-            className="flex whitespace-nowrap -mt-12 sm:-mt-20 md:-mt-24 lg:-mt-36"
+            className="flex whitespace-nowrap lg:-mt-20"
           >
             <motion.div
               animate={scrollControls}
               className="flex whitespace-nowrap"
             >
-              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
                 Sellers Best&nbsp;
               </h2>
             </motion.div>

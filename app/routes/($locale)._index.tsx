@@ -1,35 +1,33 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Suspense, useEffect, useRef} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
 import {FlipWords} from '~/components/ui/flip-words';
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useAnimation,
+  useInView,
+} from 'motion/react';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return defer({...deferredData, ...criticalData});
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context}: LoaderFunctionArgs) {
   const [{collections}] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   return {
@@ -37,16 +35,10 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
   };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
@@ -59,9 +51,9 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const words = ['SALTY', 'ELEGANT', 'BOLD'];
+
   return (
     <>
-      {/* Hero Section with Video */}
       <section className="relative h-screen w-full font-poppins">
         <video
           autoPlay
@@ -72,19 +64,18 @@ export default function Homepage() {
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
-        {/* Optional: Overlay */}
         <div className="absolute inset-0 bg-black/40"></div>
-        {/* Desktop/Tablet Version */}
+
         <div className="hidden md:block absolute bottom-20 left-10 text-6xl font-bold text-white">
           <p className="inline mr-4">KEEP IT</p>
           <FlipWords words={words} /> <br />
         </div>
 
-        {/* Mobile Version */}
         <div className="md:hidden absolute bottom-20 left-10 text-6xl font-bold text-white">
           <p className="mb-0">KEEP IT</p>
           <FlipWords words={words} /> <br />
         </div>
+
         <div className="hidden md:inline-block absolute bottom-20 right-10">
           <div className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer border border-[#BEB1A1] py-2 px-4 rounded-full">
             <Link
@@ -102,33 +93,8 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* Other Sections */}
-      <div>
-        <RecommendedProducts products={data.recommendedProducts} />
-      </div>
+      <RecommendedProducts products={data.recommendedProducts} />
     </>
-  );
-}
-
-function FeaturedCollection({
-  collection,
-}: {
-  collection: FeaturedCollectionFragment;
-}) {
-  if (!collection) return null;
-  const image = collection?.image;
-  return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
   );
 }
 
@@ -137,15 +103,78 @@ function RecommendedProducts({
 }: {
   products: Promise<RecommendedProductsQuery | null>;
 }) {
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, {
+    once: true,
+    amount: 0.1,
+    margin: '100px 0px 0px 0px',
+  });
+  const springControls = useAnimation();
+  const scrollControls = useAnimation();
+
+  useEffect(() => {
+    if (isInView) {
+      springControls.start({
+        x: 0,
+        opacity: 1,
+        transition: {
+          type: 'spring',
+          stiffness: 50,
+          damping: 20,
+          duration: 0.8,
+        },
+      });
+
+      setTimeout(() => {
+        scrollControls.start({
+          x: ['-0%', '-50%'],
+          transition: {
+            duration: 20,
+            ease: 'linear',
+            repeat: Infinity,
+          },
+        });
+      }, 1000);
+    }
+  }, [isInView, springControls, scrollControls]);
+
   return (
-    <div id="recommended-products">
-      <h2 className="text-red-500 text-3xl font-poppins">
-        Recommended Products
-      </h2>
+    <section id="recommended-products" className="bg-brandBeige">
+      <div
+        ref={containerRef}
+        className="relative w-full overflow-hidden whitespace-nowrap"
+      >
+        <div className="inline-flex">
+          <motion.div
+            initial={{x: '50%', opacity: 0}}
+            animate={springControls}
+            className="flex whitespace-nowrap -mt-12 sm:-mt-20 md:-mt-24 lg:-mt-36"
+          >
+            <motion.div
+              animate={scrollControls}
+              className="flex whitespace-nowrap"
+            >
+              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+                Best Sellers&nbsp;
+              </h2>
+              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+                Best Sellers&nbsp;
+              </h2>
+              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+                Best Sellers&nbsp;
+              </h2>
+              <h2 className="text-black text-[200px] sm:text-[300px] md:text-[400px] lg:text-[600px] font-poppins uppercase shrink-0">
+                Sellers Best&nbsp;
+              </h2>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
-            <div className="recommended-products-grid">
+            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8">
               {response
                 ? response.products.nodes.map((product) => (
                     <Link
@@ -158,8 +187,10 @@ function RecommendedProducts({
                         aspectRatio="1/1"
                         sizes="(min-width: 45em) 20vw, 50vw"
                       />
-                      <h4>{product.title}</h4>
-                      <small>
+                      <h4 className="text-sm sm:text-base lg:text-lg">
+                        {product.title}
+                      </h4>
+                      <small className="text-xs sm:text-sm">
                         <Money data={product.priceRange.minVariantPrice} />
                       </small>
                     </Link>
@@ -170,7 +201,7 @@ function RecommendedProducts({
         </Await>
       </Suspense>
       <br />
-    </div>
+    </section>
   );
 }
 

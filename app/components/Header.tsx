@@ -181,7 +181,7 @@ function CartBadge({count}: {count: number | null}) {
     >
       <ShoppingBag size={24} />
       {count !== null && (
-        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#BEB1A1] text-xs text-white">
+        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brandBeige text-xs text-white">
           {count}
         </span>
       )}

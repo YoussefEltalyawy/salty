@@ -73,7 +73,7 @@ export function Header({
       </div>
 
       {/* Main Header */}
-      <div className="relative w-full bg-transparent backdrop-blur-sm">
+      <div className="relative w-full bg-transparent backdrop-blur-sm z-10">
         <header className="mx-auto flex items-center justify-between px-12 py-4 text-white">
           {/* Left Section - Menu & User */}
           <div className="flex items-center space-x-4">
@@ -198,10 +198,10 @@ function CartBadge({count}: {count: number | null}) {
   const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
-    <a
-      href="/cart"
-      onClick={(e) => {
-        e.preventDefault();
+    <button
+      type="button"
+      aria-label="Open cart"
+      onClick={() => {
         open('cart');
         publish('cart_viewed', {
           cart,
@@ -215,10 +215,10 @@ function CartBadge({count}: {count: number | null}) {
       <ShoppingBag size={24} />
       {count !== null && (
         <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brandBeige text-xs text-white">
-          {count}
+          {count > 9 ? '9+' : count}
         </span>
       )}
-    </a>
+    </button>
   );
 }
 

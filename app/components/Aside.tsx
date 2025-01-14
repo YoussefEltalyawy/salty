@@ -1,10 +1,5 @@
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {createContext, useContext, useEffect, useState} from 'react';
+import type {KeyboardEvent, ReactNode} from 'react';
 
 type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
 type AsideContextValue = {
@@ -36,37 +31,86 @@ export function Aside({
   const expanded = type === activeType;
 
   useEffect(() => {
-    const abortController = new AbortController();
+    if (!expanded) return;
+    const scrollY = window.scrollY;
 
-    if (expanded) {
-      document.addEventListener(
-        'keydown',
-        function handler(event: KeyboardEvent) {
-          if (event.key === 'Escape') {
-            close();
-          }
-        },
-        {signal: abortController.signal},
-      );
-    }
-    return () => abortController.abort();
-  }, [close, expanded]);
+    const originalStyles = {
+      overflow: document.body.style.overflow,
+      height: document.body.style.height,
+      position: document.body.style.position,
+      width: document.body.style.width,
+      top: document.body.style.top,
+    };
 
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = `-${scrollY}px`;
+
+    return () => {
+      document.body.style.overflow = originalStyles.overflow;
+      document.body.style.height = originalStyles.height;
+      document.body.style.position = originalStyles.position;
+      document.body.style.width = originalStyles.width;
+      document.body.style.top = originalStyles.top;
+
+      window.scrollTo(0, scrollY);
+    };
+  }, [expanded]);
+  useEffect(() => {
+    if (!expanded) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'ESC') {
+        close();
+      }
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    };
+  }, [expanded, close]);
   return (
     <div
       aria-modal
-      className={`overlay  ${expanded ? 'expanded' : ''}`}
+      className={`
+        fixed inset-0 z-50 transition-opacity duration-300 ease-in-out
+        ${expanded ? 'opactiy-100' : 'opacity-0 pointer-events-none'}
+      `}
       role="dialog"
     >
-      <button className="close-outside" onClick={close} />
-      <aside>
-        <header>
-          <h3>{heading}</h3>
-          <button className="close reset" onClick={close} aria-label="Close">
-            &times;
+      {/* Overlay */}
+      <div
+        className={`absolute inset-0 bg-black/30`}
+        onClick={close}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            close();
+          }
+        }}
+      ></div>
+      {/* Aside Panel */}
+      <aside
+        className={`
+          flex flex-col absolute top-0 right-0 h-[100dvh] w-full max-w-md 
+          bg-white shadow-xl
+          transform transition-transform duration-300 ease-in-out font-poppins
+          ${expanded ? 'translate-x-0' : 'translate-x-full'}
+        `}
+      >
+        {/* Header */}
+        <header className="flex items-center justify-between p-6 mt-1 border-b border-gray-300">
+          <h3 className="text-xl font-semibold">{heading}</h3>
+          <button
+            onClick={close}
+            className="rounded-full"
+            aria-label="Close panel"
+          >
+            <span className="sr-only">Close</span>✕
           </button>
         </header>
-        <main>{children}</main>
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </aside>
     </div>
   );

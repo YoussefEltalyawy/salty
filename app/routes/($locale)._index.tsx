@@ -170,7 +170,6 @@ function RecommendedProducts({
           </motion.div>
         </div>
       </div>
-
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (

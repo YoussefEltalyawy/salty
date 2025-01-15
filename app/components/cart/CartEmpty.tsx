@@ -17,11 +17,13 @@ function CartEmpty({
           <ShoppingBag className="w-8 h-8 text-brandBeige" />
         </div>
 
-        <h2 className="text-xl font-medium mb-2">Your cart is empty</h2>
+        <h2 className="text-xl font-medium mb-2">
+          Oops! Your cart is on a diet.
+        </h2>
 
         <p className="text-gray-500 mb-8">
-          Looks like you haven&apos;t added anything yet, let&apos;s get you
-          started!
+          Looks like you haven&apos;t added anything yet, Feed it with some
+          amazing finds! 
         </p>
 
         <Link

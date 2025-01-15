@@ -173,25 +173,30 @@ function RecommendedProducts({
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
-            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8">
+            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8 font-poppins">
               {response
                 ? response.products.nodes.map((product) => (
                     <Link
                       key={product.id}
-                      className="recommended-product"
+                      className="recommended-product group relative block overflow-hidden transition-all duration-300 "
                       to={`/products/${product.handle}`}
                     >
-                      <Image
-                        data={product.images.nodes[0]}
-                        aspectRatio="1/1"
-                        sizes="(min-width: 45em) 20vw, 50vw"
-                      />
-                      <h4 className="text-sm sm:text-base lg:text-lg">
-                        {product.title}
-                      </h4>
-                      <small className="text-xs sm:text-sm">
-                        <Money data={product.priceRange.minVariantPrice} />
-                      </small>
+                      <div className="aspect-[9/16] overflow-hidden">
+                        <Image
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          data={product.images.nodes[0]}
+                          aspectRatio="9/16"
+                          sizes="(min-width: 45em) 20vw, 50vw"
+                        />
+                      </div>
+                      <div className="pt-2">
+                        <h4 className="text-sm sm:text-base lg:text-lg font-medium text-black/90">
+                          {product.title}
+                        </h4>
+                        <small className="text-xs sm:text-sm text-black/60 mt-1 block">
+                          <Money data={product.priceRange.minVariantPrice} />
+                        </small>
+                      </div>
                     </Link>
                   ))
                 : null}

@@ -1,6 +1,6 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense, useEffect, useRef} from 'react';
+import {Suspense, useEffect, useRef, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
@@ -14,6 +14,8 @@ import {
   useAnimation,
   useInView,
 } from 'motion/react';
+import {ArrowRight, ArrowUpRight} from 'lucide-react';
+import BrandStorySection from '~/components/BrandStory';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -51,6 +53,13 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const words = ['SALTY', 'ELEGANT', 'BOLD'];
+  const [email, setEmail] = useState('');
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle newsletter subscription
+    setEmail('');
+  };
 
   return (
     <>
@@ -93,7 +102,61 @@ export default function Homepage() {
         </div>
       </section>
 
+      {/* Featured Collection */}
+      {/* <section className="relative min-h-screen bg-white py-24">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="relative">
+              <motion.div
+                initial={{opacity: 0, y: 20}}
+                whileInView={{opacity: 1, y: 0}}
+                transition={{duration: 0.8}}
+                viewport={{once: true}}
+                className="relative aspect-[4/5] overflow-hidden rounded-lg"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1581338834647-b0fb40704e21?auto=format&fit=crop&q=80"
+                  alt="Featured Collection"
+                  className="object-cover w-full h-full"
+                />
+              </motion.div>
+              <div className="absolute -bottom-8 -right-8 bg-black text-white p-6 rounded-lg">
+                <p className="text-sm uppercase tracking-wider mb-2">
+                  New Collection
+                </p>
+                <h3 className="text-2xl font-bold">Winter 2024</h3>
+              </div>
+            </div>
+            <motion.div
+              initial={{opacity: 0, x: 20}}
+              whileInView={{opacity: 1, x: 0}}
+              transition={{duration: 0.8, delay: 0.2}}
+              viewport={{once: true}}
+              className="space-y-8"
+            >
+              <h2 className="text-5xl font-bold">
+                Discover Our Latest Collection
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Embrace the season with our carefully curated pieces that blend
+                timeless elegance with contemporary boldness. Each item tells a
+                story of craftsmanship and style.
+              </p>
+              <Link
+                to="/collections/winter-2024"
+                className="inline-flex items-center gap-2 text-lg font-medium hover:gap-4 transition-all"
+              >
+                Explore Collection <ArrowRight className="w-5 h-5" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section> */}
+
       <RecommendedProducts products={data.recommendedProducts} />
+
+      {/* Brand Story */}
+      <BrandStorySection />
     </>
   );
 }

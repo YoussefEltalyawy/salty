@@ -6,6 +6,7 @@ import {Link} from '@remix-run/react';
 import {ProductPrice} from '../ProductPrice';
 import {useAside} from '../Aside';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import CartLineQuantityAdjustor from './CartLineQuantityAdjustor';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -24,47 +25,55 @@ export function CartLineItem({
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
-
   return (
-    <li key={id} className="cart-line">
-      {image && (
-        <Image
-          alt={title}
-          aspectRatio="1/1"
-          data={image}
-          height={100}
-          loading="lazy"
-          width={100}
-        />
-      )}
+    <div className="flex gap-4 py-6 border-b border-black/30 font-poppins">
+      {/* Product Image */}
+      <div className="relative w-24 h-24 bg-gray-50 rounded-lg overflow-hidden">
+        {image && (
+          <Image
+            alt={title}
+            aspectRatio="1/1"
+            data={image}
+            className="object-cover w-full h-full"
+            loading="lazy"
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+          />
+        )}
+      </div>
 
-      <div>
+      {/* Product Details */}
+      <div className="flex-1 min-w-0">
         <Link
           prefetch="intent"
           to={lineItemUrl}
-          onClick={() => {
-            if (layout === 'aside') {
-              close();
-            }
-          }}
+          onClick={close}
+          className="block"
         >
-          <p>
-            <strong>{product.title}</strong>
-          </p>
+          <h3 className="text-base text-black/90 mb-1 truncate">
+            {product.title}
+          </h3>
         </Link>
-        <ProductPrice price={line?.cost?.totalAmount} />
-        <ul>
+
+        {/* Product Options */}
+        <div className="mt-1 space-y1">
           {selectedOptions.map((option) => (
-            <li key={option.name}>
-              <small>
-                {option.name}: {option.value}
-              </small>
-            </li>
+            <p
+              key={`${product.id}-${option.name}`}
+              className="text-sm text-black/60"
+            >
+              {option.name}: {option.value}
+            </p>
           ))}
-        </ul>
-        <CartLineQuantity line={line} />
+        </div>
+        {/* Price & Quantity */}
+        <div className="mt-4 flex items-center justify-between">
+          <CartLineQuantityAdjustor line={line} />
+          <div className="font-medium">
+            <ProductPrice price={line.cost.totalAmount} />
+          </div>
+        </div>
       </div>
-    </li>
+    </div>
   );
 }
 
@@ -73,41 +82,6 @@ export function CartLineItem({
  * These controls are disabled when the line item is new, and the server
  * hasn't yet responded that it was successfully added to the cart.
  */
-function CartLineQuantity({line}: {line: CartLine}) {
-  if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
-  const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
-  const nextQuantity = Number((quantity + 1).toFixed(0));
-
-  return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
-    </div>
-  );
-}
 
 /**
  * A button that removes a line item from the cart. It is disabled

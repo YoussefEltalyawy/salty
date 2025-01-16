@@ -34,12 +34,7 @@ function CartLineQuantityAdjustor({line}: CartLineQuantityAdjustorProps) {
       <span className="w-8 text-center">{quantity}</span>
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
-          disabled={quantity <= 1}
-          className={`w-8 h-8 flex items-center justify-center rounded border transition-colors ${
-            quantity <= 1
-              ? 'text-gray-300 border-gray-200'
-              : 'border-gray-200 hover:border-gray-400 text-gray-500'
-          }`}
+          className={`w-8 h-8 flex items-center justify-center rounded border transition-colors border-gray-200 hover:border-gray-400 text-gray-500`}
         >
           <Plus className="w-4 h-4" />
         </button>

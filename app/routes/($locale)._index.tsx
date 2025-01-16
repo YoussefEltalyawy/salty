@@ -1,6 +1,6 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense, useEffect, useRef, useState} from 'react';
+import {Suspense, useEffect, useRef} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
@@ -14,7 +14,6 @@ import {
   useAnimation,
   useInView,
 } from 'motion/react';
-import {ArrowRight, ArrowUpRight} from 'lucide-react';
 import BrandStorySection from '~/components/BrandStory';
 
 export const meta: MetaFunction = () => {
@@ -27,13 +26,13 @@ export async function loader(args: LoaderFunctionArgs) {
   return defer({...deferredData, ...criticalData});
 }
 
-async function loadCriticalData({context}: LoaderFunctionArgs) {
+export async function loadCriticalData({context}: LoaderFunctionArgs) {
   const [{collections}] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
   ]);
 
   return {
-    featuredCollection: collections.nodes[0],
+    collections: collections.nodes,
   };
 }
 
@@ -53,13 +52,6 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const words = ['SALTY', 'ELEGANT', 'BOLD'];
-  const [email, setEmail] = useState('');
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle newsletter subscription
-    setEmail('');
-  };
 
   return (
     <>
@@ -101,63 +93,47 @@ export default function Homepage() {
           </div>
         </div>
       </section>
-
-      {/* Featured Collection */}
-      {/* <section className="relative min-h-screen bg-white py-24">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative">
-              <motion.div
-                initial={{opacity: 0, y: 20}}
-                whileInView={{opacity: 1, y: 0}}
-                transition={{duration: 0.8}}
-                viewport={{once: true}}
-                className="relative aspect-[4/5] overflow-hidden rounded-lg"
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1581338834647-b0fb40704e21?auto=format&fit=crop&q=80"
-                  alt="Featured Collection"
-                  className="object-cover w-full h-full"
-                />
-              </motion.div>
-              <div className="absolute -bottom-8 -right-8 bg-black text-white p-6 rounded-lg">
-                <p className="text-sm uppercase tracking-wider mb-2">
-                  New Collection
-                </p>
-                <h3 className="text-2xl font-bold">Winter 2024</h3>
-              </div>
-            </div>
-            <motion.div
-              initial={{opacity: 0, x: 20}}
-              whileInView={{opacity: 1, x: 0}}
-              transition={{duration: 0.8, delay: 0.2}}
-              viewport={{once: true}}
-              className="space-y-8"
-            >
-              <h2 className="text-5xl font-bold">
-                Discover Our Latest Collection
-              </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Embrace the season with our carefully curated pieces that blend
-                timeless elegance with contemporary boldness. Each item tells a
-                story of craftsmanship and style.
-              </p>
-              <Link
-                to="/collections/winter-2024"
-                className="inline-flex items-center gap-2 text-lg font-medium hover:gap-4 transition-all"
-              >
-                Explore Collection <ArrowRight className="w-5 h-5" />
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section> */}
-
       <RecommendedProducts products={data.recommendedProducts} />
-
-      {/* Brand Story */}
       <BrandStorySection />
+      <FeaturedCollections collections={data.collections} />
     </>
+  );
+}
+
+function FeaturedCollections({
+  collections,
+}: {
+  collections: FeaturedCollectionFragment[];
+}) {
+  if (!collections?.length) return null;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 sm:px-6 lg:px-8 py-8">
+      {collections.map((collection) => (
+        <Link
+          key={collection.id}
+          className="featured-collection group"
+          to={`/collections/${collection.handle}`}
+        >
+          {collection.image && (
+            <div className="featured-collection-image relative aspect-[16/9] overflow-hidden rounded-lg">
+              <Image
+                data={collection.image}
+                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+            </div>
+          )}
+          <div className="mt-4 space-y-2">
+            <h2 className="text-lg font-medium text-black/90 group-hover:text-black transition-colors">
+              {collection.title}
+            </h2>
+            <div className="h-0.5 w-0 bg-black group-hover:w-full transition-all duration-300" />
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -236,29 +212,36 @@ function RecommendedProducts({
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
-            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8 font-poppins">
+            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8 font-poppins grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 ">
               {response
                 ? response.products.nodes.map((product) => (
                     <Link
                       key={product.id}
-                      className="recommended-product group relative block overflow-hidden transition-all duration-300 "
+                      className="recommended-product group block"
                       to={`/products/${product.handle}`}
                     >
-                      <div className="aspect-[9/16] overflow-hidden">
+                      <div className="relative aspect-[9/16] overflow-hidden rounded-lg">
                         <Image
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                           data={product.images.nodes[0]}
                           aspectRatio="9/16"
                           sizes="(min-width: 45em) 20vw, 50vw"
                         />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            <Money
+                              className="text-white font-medium text-lg"
+                              data={product.priceRange.minVariantPrice}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div className="pt-2">
-                        <h4 className="text-sm sm:text-base lg:text-lg font-medium text-black/90">
+                      <div className="mt-4 space-y-2">
+                        <h4 className="text-sm sm:text-base lg:text-lg font-medium text-black/90 group-hover:text-black transition-colors">
                           {product.title}
                         </h4>
-                        <small className="text-xs sm:text-sm text-black/60 mt-1 block">
-                          <Money data={product.priceRange.minVariantPrice} />
-                        </small>
+                        <div className="h-0.5 w-0 bg-black group-hover:w-full transition-all duration-300" />
                       </div>
                     </Link>
                   ))
@@ -267,7 +250,7 @@ function RecommendedProducts({
           )}
         </Await>
       </Suspense>
-      <br />
+      <div className="h-16" /> {/* Bottom spacing */}
     </section>
   );
 }
@@ -285,9 +268,9 @@ const FEATURED_COLLECTION_QUERY = `#graphql
     }
     handle
   }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
+  query FeaturedCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 10, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...FeaturedCollection
       }

@@ -39,7 +39,10 @@ function CartLineQuantityAdjustor({line}: CartLineQuantityAdjustorProps) {
           <Plus className="w-4 h-4" />
         </button>
       </CartLineUpdateButton>
-      <CartLineRemoveButton />
+      <CartLineRemoveButton
+        lineIds={[lineId]}
+        disabled={isOptimistic === true}
+      />
     </div>
   );
 }

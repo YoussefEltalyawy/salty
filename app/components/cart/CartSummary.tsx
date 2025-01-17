@@ -2,8 +2,9 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/cart/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useRef} from 'react';
-import {FetcherWithComponents} from '@remix-run/react';
+import type {FetcherWithComponents} from '@remix-run/react';
 import {X} from 'lucide-react';
+import CartDiscounts from './CartDiscounts';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -12,7 +13,7 @@ type CartSummaryProps = {
 
 export function CartSummary({cart, layout}: CartSummaryProps) {
   const isPage = layout === 'page';
-
+  // fixed bottom-4 left-4 z-50 w-full pr-8
   return (
     <div
       className={`
@@ -21,8 +22,6 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     `}
     >
       <div className="p-4">
-        <h4 className="text-lg font-medium mb-4">Summary</h4>
-
         <div className="space-y-3">
           {/* Subtotal */}
           <div className="flex justify-between text-sm">
@@ -37,10 +36,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           </div>
 
           {/* Discounts */}
-          <CartDiscounts discountCodes={cart.discountCodes} />
 
           {/* Gift Cards */}
-          <CartGiftCard giftCardCodes={cart.appliedGiftCards} />
 
           {/* Checkout Button */}
           <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
@@ -61,52 +58,6 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
     >
       Continue to Checkout
     </a>
-  );
-}
-
-function CartDiscounts({
-  discountCodes,
-}: {
-  discountCodes?: CartApiQueryFragment['discountCodes'];
-}) {
-  const codes =
-    discountCodes?.filter((d) => d.applicable)?.map(({code}) => code) || [];
-
-  return (
-    <div className="space-y-2">
-      {/* Active Discounts */}
-      {codes.length > 0 && (
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500">Discount</span>
-          <UpdateDiscountForm>
-            <div className="flex items-center gap-2">
-              <code className="text-green-600">{codes.join(', ')}</code>
-              <button className="text-gray-400 hover:text-gray-600">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </UpdateDiscountForm>
-        </div>
-      )}
-
-      {/* Discount Input */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-            className="flex-1 px-2.5 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-black"
-          />
-          <button
-            type="submit"
-            className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-          >
-            Apply
-          </button>
-        </div>
-      </UpdateDiscountForm>
-    </div>
   );
 }
 
@@ -169,22 +120,6 @@ function CartGiftCard({
     </div>
   );
 }
-
-const UpdateDiscountForm = ({
-  discountCodes,
-  children,
-}: {
-  discountCodes?: string[];
-  children: React.ReactNode;
-}) => (
-  <CartForm
-    route="/cart"
-    action={CartForm.ACTIONS.DiscountCodesUpdate}
-    inputs={{discountCodes: discountCodes || []}}
-  >
-    {children}
-  </CartForm>
-);
 
 const UpdateGiftCardForm = ({
   giftCardCodes,

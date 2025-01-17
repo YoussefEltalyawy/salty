@@ -26,7 +26,7 @@ export function CartLineItem({
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
   return (
-    <div className="flex gap-4 py-6 border-b border-black/30 font-poppins">
+    <div className="flex gap-4 py-6 px-2 border-b border-black/15 font-poppins">
       {/* Product Image */}
       <div className="relative w-24 h-24 bg-gray-50 rounded-lg overflow-hidden">
         {image && (
@@ -68,7 +68,7 @@ export function CartLineItem({
         {/* Price & Quantity */}
         <div className="mt-4 flex items-center justify-between">
           <CartLineQuantityAdjustor line={line} />
-          <div className="font-medium">
+          <div className="text-base text-black/90">
             <ProductPrice price={line.cost.totalAmount} />
           </div>
         </div>

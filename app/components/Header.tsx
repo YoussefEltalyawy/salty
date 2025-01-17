@@ -113,7 +113,7 @@ export function Header({
         }`}
     >
       {/* Other Pages Header */}
-      <div className="relative w-full bg-transparent bg-black z-10">
+      <div className="relative w-full bg-black z-10">
         <header className="mx-auto flex items-center justify-between px-12 py-4 text-white">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
@@ -223,18 +223,12 @@ function HeaderMenuMobileToggle() {
 }
 
 // Search Toggle
+// Search Toggle
 function SearchToggle() {
   const {open} = useAside();
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
-
   return (
     <button className="reset" onClick={() => open('search')}>
-      <Search
-        className={`w-6 h-6 lg:w-7 lg:h-7 ${
-          isHomePage ? 'text-white' : 'text-black'
-        }`}
-      />
+      <Search className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
     </button>
   );
 }
@@ -243,14 +237,12 @@ function SearchToggle() {
 function CartBadge({count}: {count: number | null}) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
 
   return (
-    <button
-      type="button"
-      aria-label="Open cart"
-      onClick={() => {
+    <a
+      href="/cart"
+      onClick={(e) => {
+        e.preventDefault();
         open('cart');
         publish('cart_viewed', {
           cart,
@@ -261,16 +253,13 @@ function CartBadge({count}: {count: number | null}) {
       }}
       className="relative inline-flex items-center"
     >
-      <ShoppingBag
-        size={24}
-        className={isHomePage ? 'text-white' : 'text-black'}
-      />
+      <ShoppingBag size={24} />
       {count !== null && (
         <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brandBeige text-xs text-white">
-          {count > 9 ? '9+' : count}
+          {count}
         </span>
       )}
-    </button>
+    </a>
   );
 }
 

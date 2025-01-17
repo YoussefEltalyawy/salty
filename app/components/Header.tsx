@@ -1,5 +1,5 @@
 import {Suspense, useEffect, useState} from 'react';
-import {Await, NavLink, useAsyncValue} from '@remix-run/react';
+import {Await, NavLink, useAsyncValue, useLocation} from '@remix-run/react';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -26,13 +26,14 @@ export function Header({
   publicStoreDomain,
 }: HeaderProps) {
   const {shop, menu} = header;
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const {type: asideType} = useAside();
 
-  // Handle scroll effects
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--announcment-height', isScrolled ? '0px' : '40px');
@@ -41,7 +42,6 @@ export function Header({
     const handleScroll = () => {
       if (asideType !== 'closed') return;
       const currentScrollY = window.scrollY;
-
       setIsScrollingUp(currentScrollY < lastScrollY);
       setLastScrollY(currentScrollY);
       setIsScrolled(currentScrollY > 50);
@@ -51,31 +51,71 @@ export function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, isScrolled, asideType]);
 
+  if (isHomePage) {
+    return (
+      <div
+        className={`fixed w-full z-20 transition-all duration-500 ease-in-out 
+        ${
+          isScrollingUp && isScrolled && asideType === 'closed'
+            ? 'translate-y-0'
+            : '-translate-y-0'
+        }`}
+      >
+        {/* Announcement Bar */}
+        <div
+          className={`w-full bg-brandBeige text-black transition-all duration-500 ease-in-out
+        ${isScrolled ? 'h-0 opacity-0' : 'h-10 opacity-100'}`}
+        >
+          <div className="container mx-auto text-center py-2.5">
+            <p className="font-poppins text-sm font-light">
+              Free shipping for orders above 1500 EGP!
+            </p>
+          </div>
+        </div>
+        {/* Home Page Header */}
+        <div className="relative w-full bg-transparent backdrop-blur-sm z-10">
+          <header className="mx-auto flex items-center justify-between px-12 py-4 text-white">
+            {/* Left Section */}
+            <div className="flex items-center space-x-4">
+              <HeaderMenuMobileToggle />
+              <User className="w-6 h-6 lg:w-7 lg:h-7" />
+            </div>
+
+            {/* Center Section - Logo */}
+            <div className="flex-1 flex justify-center">
+              <NavLink to="/" prefetch="intent">
+                <img
+                  src="/logo.png"
+                  alt={shop.name}
+                  className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-all duration-300"
+                />
+              </NavLink>
+            </div>
+
+            {/* Right Section */}
+            <div className="flex items-center space-x-4">
+              <SearchToggle />
+              <CartToggle cart={cart} />
+            </div>
+          </header>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`fixed w-full z-20 transition-all duration-500 ease-in-out 
-      ${
-        isScrollingUp && isScrolled && asideType === 'closed'
-          ? 'translate-y-0'
-          : '-translate-y-0'
-      }`}
+        ${
+          isScrollingUp && isScrolled && asideType === 'closed'
+            ? 'translate-y-0'
+            : '-translate-y-0'
+        }`}
     >
-      {/* Announcement Bar */}
-      <div
-        className={`w-full bg-brandBeige text-black transition-all duration-500 ease-in-out
-        ${isScrolled ? 'h-0 opacity-0' : 'h-10 opacity-100'}`}
-      >
-        <div className="container mx-auto text-center py-2.5">
-          <p className="font-poppins text-sm font-light">
-            Free shipping for orders above 1500 EGP!
-          </p>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="relative w-full bg-transparent backdrop-blur-sm z-10">
+      {/* Other Pages Header */}
+      <div className="relative w-full bg-transparent bg-black z-10">
         <header className="mx-auto flex items-center justify-between px-12 py-4 text-white">
-          {/* Left Section - Menu & User */}
+          {/* Left Section */}
           <div className="flex items-center space-x-4">
             <HeaderMenuMobileToggle />
             <User className="w-6 h-6 lg:w-7 lg:h-7" />
@@ -92,7 +132,7 @@ export function Header({
             </NavLink>
           </div>
 
-          {/* Right Section - Search & Cart */}
+          {/* Right Section */}
           <div className="flex items-center space-x-4">
             <SearchToggle />
             <CartToggle cart={cart} />
@@ -185,9 +225,16 @@ function HeaderMenuMobileToggle() {
 // Search Toggle
 function SearchToggle() {
   const {open} = useAside();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   return (
     <button className="reset" onClick={() => open('search')}>
-      <Search className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+      <Search
+        className={`w-6 h-6 lg:w-7 lg:h-7 ${
+          isHomePage ? 'text-white' : 'text-black'
+        }`}
+      />
     </button>
   );
 }
@@ -196,6 +243,8 @@ function SearchToggle() {
 function CartBadge({count}: {count: number | null}) {
   const {open} = useAside();
   const {publish, shop, cart, prevCart} = useAnalytics();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   return (
     <button
@@ -212,7 +261,10 @@ function CartBadge({count}: {count: number | null}) {
       }}
       className="relative inline-flex items-center"
     >
-      <ShoppingBag size={24} />
+      <ShoppingBag
+        size={24}
+        className={isHomePage ? 'text-white' : 'text-black'}
+      />
       {count !== null && (
         <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brandBeige text-xs text-white">
           {count > 9 ? '9+' : count}

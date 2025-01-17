@@ -15,6 +15,7 @@ import {
   useInView,
 } from 'motion/react';
 import BrandStorySection from '~/components/BrandStory';
+import FeaturedCollections from '~/sections/FeaturedCollections';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -94,46 +95,9 @@ export default function Homepage() {
         </div>
       </section>
       <RecommendedProducts products={data.recommendedProducts} />
-      <BrandStorySection />
       <FeaturedCollections collections={data.collections} />
+      <BrandStorySection />
     </>
-  );
-}
-
-function FeaturedCollections({
-  collections,
-}: {
-  collections: FeaturedCollectionFragment[];
-}) {
-  if (!collections?.length) return null;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 sm:px-6 lg:px-8 py-8">
-      {collections.map((collection) => (
-        <Link
-          key={collection.id}
-          className="featured-collection group"
-          to={`/collections/${collection.handle}`}
-        >
-          {collection.image && (
-            <div className="featured-collection-image relative aspect-[16/9] overflow-hidden rounded-lg">
-              <Image
-                data={collection.image}
-                sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-            </div>
-          )}
-          <div className="mt-4 space-y-2">
-            <h2 className="text-lg font-medium text-black/90 group-hover:text-black transition-colors">
-              {collection.title}
-            </h2>
-            <div className="h-0.5 w-0 bg-black group-hover:w-full transition-all duration-300" />
-          </div>
-        </Link>
-      ))}
-    </div>
   );
 }
 
@@ -212,7 +176,7 @@ function RecommendedProducts({
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
-            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8 font-poppins grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 ">
+            <div className="recommended-products-grid px-4 sm:px-6 lg:px-8 font-poppins grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 ">
               {response
                 ? response.products.nodes.map((product) => (
                     <Link
@@ -301,7 +265,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }

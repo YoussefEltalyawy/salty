@@ -66,7 +66,11 @@ export function Header({
   );
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-20">
+    <div
+      className={` z-20 ${
+        isHomePage ? 'fixed top-0 left-0 right-0' : 'static'
+      }`}
+    >
       {/* Announcement Bar */}
       <div
         className={`

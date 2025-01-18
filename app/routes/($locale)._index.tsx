@@ -182,6 +182,7 @@ function RecommendedProducts({
                     <Link
                       key={product.id}
                       className="recommended-product group block"
+                      prefetch="intent"
                       to={`/products/${product.handle}`}
                     >
                       <div className="relative aspect-[9/16] overflow-hidden rounded-lg">

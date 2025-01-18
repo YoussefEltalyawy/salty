@@ -167,13 +167,13 @@ function ProductImage({selectedVariantImage, images}: ProductImageProps) {
       </div>
       {/* Modal / PopUp */}
       {modalOpen && (
-        <div className="fiexed top-0 left-0 !my-0 inset-0 z-50 bg-black/80 backdrop-blur-sm">
+        <div className="fixed top-0 left-0 !my-0 inset-0 z-50 bg-black/80 backdrop-blur-sm">
           <div className="absolute inset-0 overflow-hidden">
             {/* Close Button */}
             <button>
               <X
                 onClick={closeModal}
-                className="absolute top-4 right-4 w-6 h-6 z-50 p-2 text-white/80 hover:text-white transition-colors"
+                className="absolute top-4 right-4 w-6 h-6 z-50  text-white/80 hover:text-white transition-colors"
               />
             </button>
 
@@ -202,12 +202,14 @@ function ProductImage({selectedVariantImage, images}: ProductImageProps) {
                     }`}
                     style={{transform: getImagePosition(index)}}
                   >
-                    <Image
-                      alt={image.altText || 'Product Image'}
-                      data={image}
-                      sizes="90vw"
-                      className="max-w-full max-h-[85vh] object-contain"
-                    />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <Image
+                        alt={image.altText || 'Product Image'}
+                        data={image}
+                        sizes="90vw"
+                        className="max-w-full max-h-[85vh] object-contain"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -218,12 +220,12 @@ function ProductImage({selectedVariantImage, images}: ProductImageProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (selectedIndex > 0) {
+                  if (modalIndex > 0) {
                     setModalIndex((prev) => prev - 1);
                   }
                 }}
                 disabled={modalIndex === 0}
-                className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+                className=" text-white/80 hover:text-white transition-colors"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
@@ -235,7 +237,7 @@ function ProductImage({selectedVariantImage, images}: ProductImageProps) {
                   }
                 }}
                 disabled={modalIndex === allImages.length - 1}
-                className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+                className=" text-white/80 hover:text-white transition-colors"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>

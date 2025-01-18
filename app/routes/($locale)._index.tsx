@@ -16,6 +16,7 @@ import {
 } from 'motion/react';
 import BrandStorySection from '~/components/BrandStory';
 import FeaturedCollections from '~/sections/FeaturedCollections';
+import ShopTheFit from '~/sections/ShopTheFit';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -96,6 +97,7 @@ export default function Homepage() {
       </section>
       <RecommendedProducts products={data.recommendedProducts} />
       <FeaturedCollections collections={data.collections} />
+      <ShopTheFit />
       <BrandStorySection />
     </>
   );

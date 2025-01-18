@@ -2,6 +2,7 @@ import {Suspense, useEffect, useState} from 'react';
 import {Await, NavLink, useAsyncValue, useLocation} from '@remix-run/react';
 import {
   type CartViewPayload,
+  Image,
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
@@ -49,7 +50,7 @@ export function Header({
       {/* Center Section - Logo */}
       <div className="flex-1 flex justify-center">
         <NavLink to="/" prefetch="intent">
-          <img
+          <Image
             src="/logo.png"
             alt={shop.name}
             className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-all duration-300"

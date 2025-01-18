@@ -1,5 +1,5 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from '@remix-run/react';
+import {Await, useLoaderData, type MetaFunction} from '@remix-run/react';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -11,6 +11,7 @@ import {
 import {ProductPrice} from '~/components/ProductPrice';
 import ProductImage from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
+import {Suspense} from 'react';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -98,9 +99,9 @@ export default function Product() {
   const {title, descriptionHtml} = product;
 
   return (
-    <div className="pt-16">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+    <div className="py-16 font-poppins">
+      <div className="mx-auto px-4 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-16">
           {/* Left Side - Image */}
           <div className="space-y-8">
             <ProductImage
@@ -116,6 +117,45 @@ export default function Product() {
           </div>
 
           {/* Right Side - Detials */}
+          <div className="space-y-10">
+            {/* Product Title & Price */}
+            <div className="space-y-4 pb-0">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl text-black/90">
+                {product.title}
+              </h1>
+              <ProductPrice
+                price={selectedVariant?.price}
+                compareAtPrice={selectedVariant.compareAtPrice}
+                className="text-black/80"
+              />
+            </div>
+
+            {/* Product Form */}
+            <ProductForm
+              productOptions={productOptions}
+              selectedVariant={selectedVariant}
+            />
+
+            {/* Product Description */}
+            <div className="font-poppins text-black/90 max-w-none">
+              <div
+                dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
+              ></div>
+            </div>
+
+            {/* <Suspense>
+              <Await resolve={variants}>
+                {(data) => (
+                  <ProductForm
+                    product={product}
+                    selectedVariant={selectedVariant}
+                    variants={data?.product?.variants.nodes || []}
+                    className="space-y-8"
+                  />
+                )}
+              </Await>
+            </Suspense> */}
+          </div>
         </div>
       </div>
       <Analytics.ProductView

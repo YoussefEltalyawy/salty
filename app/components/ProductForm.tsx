@@ -17,16 +17,18 @@ export function ProductForm({
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
+
   return (
-    <div className="product-form font-poppins">
+    <div className="space-y-6 font-poppins">
       {productOptions.map((option) => {
-        // If there is only a single value in the option values, don't display the option
         if (option.optionValues.length === 1) return null;
 
         return (
-          <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
-            <div className="product-options-grid">
+          <div key={option.name} className="space-y-4">
+            <h5 className="text-sm font-medium text-gray-900 uppercase tracking-wide">
+              {option.name}
+            </h5>
+            <div className="grid grid-cols-4 gap-4">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -39,65 +41,55 @@ export function ProductForm({
                   swatch,
                 } = value;
 
+                const baseClassName = `
+                  relative
+                  flex
+                  items-center
+                  justify-center
+                  p-2
+                  rounded-lg
+                  transition-all
+                  duration-150
+                  ${available ? 'hover:bg-gray-50' : 'cursor-not-allowed'}
+                  ${selected ? 'ring-2 ring-black' : 'ring-1 ring-gray-200'}
+                  ${!available && 'opacity-40'}
+                `;
+
                 if (isDifferentProduct) {
-                  // SEO
-                  // When the variant is a combined listing child product
-                  // that leads to a different url, we need to render it
-                  // as an anchor tag
                   return (
                     <Link
-                      className="product-options-item"
+                      className={baseClassName}
                       key={option.name + name}
                       prefetch="intent"
                       preventScrollReset
                       replace
                       to={`/products/${handle}?${variantUriQuery}`}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
                   );
-                } else {
-                  // SEO
-                  // When the variant is an update to the search param,
-                  // render it as a button with javascript navigating to
-                  // the variant so that SEO bots do not index these as
-                  // duplicated links
-                  return (
-                    <button
-                      type="button"
-                      className={`product-options-item${
-                        exists && !selected ? ' link' : ''
-                      }`}
-                      key={option.name + name}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
-                      disabled={!exists}
-                      onClick={() => {
-                        if (!selected) {
-                          navigate(`?${variantUriQuery}`, {
-                            replace: true,
-                            preventScrollReset: true,
-                          });
-                        }
-                      }}
-                    >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
-                    </button>
-                  );
                 }
+
+                return (
+                  <button
+                    type="button"
+                    className={baseClassName}
+                    key={option.name + name}
+                    disabled={!exists}
+                    onClick={() => {
+                      if (!selected) {
+                        navigate(`?${variantUriQuery}`, {
+                          replace: true,
+                          preventScrollReset: true,
+                        });
+                      }
+                    }}
+                  >
+                    <ProductOptionSwatch swatch={swatch} name={name} />
+                  </button>
+                );
               })}
             </div>
-            <br />
           </div>
         );
       })}
@@ -134,17 +126,21 @@ function ProductOptionSwatch({
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
 
-  if (!image && !color) return name;
+  if (!image && !color) {
+    return <span className="text-sm text-gray-700">{name}</span>;
+  }
 
   return (
     <div
       aria-label={name}
-      className="product-option-label-swatch"
+      className="w-8 h-8 rounded-full overflow-hidden ring-1 ring-gray-200"
       style={{
         backgroundColor: color || 'transparent',
       }}
     >
-      {!!image && <img src={image} alt={name} />}
+      {image && (
+        <img src={image} alt={name} className="w-full h-full object-cover" />
+      )}
     </div>
   );
 }

@@ -12,19 +12,21 @@ function FeaturedCollections({
   if (!collections?.length) return null;
 
   return (
-    <section className="bg-white py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.h2
+    <section className="bg-black py-12 font-poppins">
+      <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
           initial={{opacity: 0, y: 20}}
           whileInView={{opacity: 1, y: 0}}
           transition={{duration: 0.6}}
           viewport={{once: true}}
-          className="text-4xl md:text-5xl font-bold text-black mb-16 font-poppins"
+          className="text-center mb-12"
         >
-          Our Collections
-        </motion.h2>
+          <h2 className="text-5xl sm:text-4xl md:text-5xl font-bold tracking-tight text-brandBeige mb-4">
+            SHOP BY COLLECTION
+          </h2>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {collections.map((collection, index) => (
             <motion.div
               key={collection.id}
@@ -32,41 +34,33 @@ function FeaturedCollections({
               whileInView={{opacity: 1, y: 0}}
               transition={{duration: 0.5, delay: index * 0.1}}
               viewport={{once: true}}
+              className="relative aspect-[3/4] overflow-hidden"
             >
               <Link
-                className="featured-collection group block"
+                className="group block w-full h-full"
                 to={`/collections/${collection.handle}`}
               >
                 {collection.image && (
-                  <div className="featured-collection-image relative aspect-[4/5] overflow-hidden rounded-lg">
+                  <>
                     <Image
                       data={collection.image}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+                      sizes="(min-width: 1800px) 25vw, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
-
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-white text-lg font-light tracking-wider border border-white/60 py-2 px-6 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        Explore Collection
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
+                      <h3 className="text-2xl sm:text-3xl font-bold mb-2 uppercase tracking-wider">
+                        {collection.title.split(' ')[0]}
+                      </h3>
+                      <h4 className="text-xl sm:text-2xl font-bold mb-4 uppercase tracking-wider">
+                        {collection.title.split(' ').slice(1).join(' ')}
+                      </h4>
+                      <span className="inline-flex items-center justify-center px-6 py-2 border-2 border-white text-sm font-semibold hover:bg-white hover:text-black transition-colors duration-300">
+                        SHOP NOW
                       </span>
                     </div>
-                  </div>
+                  </>
                 )}
-
-                <div className="mt-6 space-y-3">
-                  <h3 className="text-xl font-medium text-black/90 group-hover:text-black transition-colors">
-                    {collection.title}
-                  </h3>
-                  <div className="flex items-center text-black/70 group-hover:text-black transition-colors">
-                    <span className="text-sm font-light tracking-wider italic">
-                      View Products
-                    </span>
-                    <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
-                      →
-                    </span>
-                  </div>
-                </div>
               </Link>
             </motion.div>
           ))}

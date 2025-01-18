@@ -1,6 +1,7 @@
 import type {ProductVariantFragment} from 'storefrontapi.generated';
 import {Image} from '@shopify/hydrogen';
 import {useState} from 'react';
+import {ChevronLeft, ChevronRight, X} from 'lucide-react';
 type GalleryImage = {
   id?: string | null;
   url: string;
@@ -120,9 +121,128 @@ function ProductImage({selectedVariantImage, images}: ProductImageProps) {
               </div>
             ))}
           </div>
+          {/* Navigation Arrows - Desktop */}
+          <div className="absolute inset-0 hidden opacity-0 md:flex item-center justify-between hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (selectedIndex > 0) {
+                  setSelectedIndex((prev) => prev - 1);
+                }
+              }}
+              disabled={selectedIndex === 0}
+              className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (selectedIndex < allImages.length - 1) {
+                  setSelectedIndex((prev) => prev + 1);
+                }
+              }}
+              disabled={selectedIndex === allImages.length - 1}
+              className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+        {/* Dot Indicator */}
+        <div className="dot flex md:hidden justify-center space-x-2 mt-4">
+          {allImages.map((_, index) => (
+            <button
+              // eslint-disable-next-line react/no-array-index-key
+              key={`$dot-${index}`}
+              onClick={() => setSelectedIndex(index)}
+              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                selectedIndex === index
+                  ? 'bg-brandBeige w-4'
+                  : 'bg-black/70 hover:bg-black/40'
+              }`}
+            ></button>
+          ))}
         </div>
       </div>
       {/* Modal / PopUp */}
+      {modalOpen && (
+        <div className="fiexed top-0 left-0 !my-0 inset-0 z-50 bg-black/80 backdrop-blur-sm">
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Close Button */}
+            <button>
+              <X
+                onClick={closeModal}
+                className="absolute top-4 right-4 w-6 h-6 z-50 p-2 text-white/80 hover:text-white transition-colors"
+              />
+            </button>
+
+            {/* Image Counter */}
+            <div className="absolute top-4 left-4 z-50">
+              <p className="text-white/80 font-poppins text-sm">
+                {modalIndex + 1} / {allImages.length}
+              </p>
+            </div>
+
+            {/* Modal Image */}
+            <div
+              className="w-full h-full flex items-center justify-center p-0 md:p-8"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div className="relative w-full h-full">
+                {allImages.map((image, index) => (
+                  <div
+                    key={`modal-image-${image.id || 'x'}-$`}
+                    className={`absolute inset-0 w-full h-full transition-transform duration-300 ease-in-out ${
+                      !isDragging
+                        ? 'transition-transform duration-300'
+                        : 'transition-none'
+                    }`}
+                    style={{transform: getImagePosition(index)}}
+                  >
+                    <Image
+                      alt={image.altText || 'Product Image'}
+                      data={image}
+                      sizes="90vw"
+                      className="max-w-full max-h-[85vh] object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation Arrows */}
+            <div className="absolute inset-0 hidden md:flex items-center justify-between px-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (selectedIndex > 0) {
+                    setModalIndex((prev) => prev - 1);
+                  }
+                }}
+                disabled={modalIndex === 0}
+                className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (modalIndex < allImages.length - 1) {
+                    setModalIndex((prev) => prev + 1);
+                  }
+                }}
+                disabled={modalIndex === allImages.length - 1}
+                className=" text-[#3f3f3f] hover:text-[#3f3f3fcd] transition-colors"
+              >
+                <ChevronRight className="w-8 h-8" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

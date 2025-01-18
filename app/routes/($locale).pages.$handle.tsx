@@ -1,76 +1,112 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, type MetaFunction} from '@remix-run/react';
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
-};
+interface PageData {
+  id: string;
+  title: string;
+  body: string;
+  seo: {
+    description: string;
+    title: string;
+  };
+}
 
-export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return defer({...deferredData, ...criticalData});
+interface LoaderData {
+  page: PageData;
+  // Add other deferred data types here
 }
 
 /**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * Meta tags configuration for the page
+ */
+export const meta: MetaFunction<typeof loader> = ({data}) => [
+  {title: `Hydrogen | ${data?.page.title ?? ''}`},
+  {description: data?.page.seo.description ?? ''},
+];
+
+/**
+ * Main loader function that combines critical and deferred data
+ * @param args - Loader function arguments from Remix
+ */
+export async function loader(args: LoaderFunctionArgs) {
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
+
+  return defer({
+    ...criticalData,
+    ...deferredData,
+  });
+}
+
+/**
+ * Loads critical data required for initial page render
+ * @throws {Response} 404 if page not found
+ * @throws {Error} if handle parameter is missing
  */
 async function loadCriticalData({context, params}: LoaderFunctionArgs) {
   if (!params.handle) {
     throw new Error('Missing page handle');
   }
 
-  const [{page}] = await Promise.all([
-    context.storefront.query(PAGE_QUERY, {
-      variables: {
-        handle: params.handle,
-      },
-    }),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+  const {page} = await context.storefront.query<{page: PageData}>(PAGE_QUERY, {
+    variables: {
+      handle: params.handle,
+    },
+  });
 
   if (!page) {
-    throw new Response('Not Found', {status: 404});
+    throw new Response('Page not found', {
+      status: 404,
+      statusText: 'Not Found',
+    });
   }
 
+  return {page};
+}
+
+/**
+ * Loads non-critical data that can be deferred
+ * This function should never throw errors to prevent page crashes
+ */
+function loadDeferredData({context}: LoaderFunctionArgs) {
   return {
-    page,
+    // Add deferred data properties here
   };
 }
 
 /**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
+ * Page component that renders the content
  */
-function loadDeferredData({context}: LoaderFunctionArgs) {
-  return {};
-}
-
 export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
+    <div className=" mx-auto px-4 py-8">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+          {page.title}
+        </h1>
       </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+
+      <main
+        className="prose prose-lg prose-indigo max-w-none mb-[25.5rem] lg:mb-[34rem]"
+        dangerouslySetInnerHTML={{__html: page.body}}
+      />
     </div>
   );
 }
 
+/**
+ * GraphQL query for fetching page data
+ */
 const PAGE_QUERY = `#graphql
   query Page(
     $language: LanguageCode,
     $country: CountryCode,
     $handle: String!
-  )
-  @inContext(language: $language, country: $country) {
+  ) @inContext(language: $language, country: $country) {
     page(handle: $handle) {
       id
       title

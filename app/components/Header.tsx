@@ -53,6 +53,8 @@ export function Header({
           <Image
             src="/logo.png"
             alt={shop.name}
+            width={80} // 20 * 4 to match lg size
+            height={80} // 20 * 4 to match lg size
             className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 transition-all duration-300"
           />
         </NavLink>

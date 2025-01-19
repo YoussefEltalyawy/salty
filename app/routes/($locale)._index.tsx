@@ -16,6 +16,7 @@ import {
 } from 'motion/react';
 import FeaturedCollections from '~/sections/FeaturedCollections';
 import ShopTheFit from '~/sections/ShopTheFit';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Salty | Home'}];
@@ -112,6 +113,68 @@ export default function Homepage() {
       <RecommendedProducts products={data.recommendedProducts} />
       <FeaturedCollections collections={data.collections} />
       <ShopTheFit />
+
+      {/* FAQ Section */}
+      <section className="w-full bg-brandBeige py-16">
+        <div className="mx-4 px-4">
+          <h2 className="mb-8 text-center text-3xl font-bold">FAQ</h2>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                How long does shipping take in Egypt?
+              </AccordionTrigger>
+              <AccordionContent>
+                Shipping takes 2-5 days from the date of purchase. In rare
+                cases, shipping may take longer due to unusual conditions.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2">
+              <AccordionTrigger>
+                Can I return or exchange items purchased online?
+              </AccordionTrigger>
+              <AccordionContent>
+                Yes, returns and exchanges are available for online purchases
+                under these conditions:
+                {'\n\n'}• The request is made within 14 days of purchase.
+                {'\n'}• Items are in their original condition (unwashed,
+                unaltered, spotless) with all tags intact.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3">
+              <AccordionTrigger>
+                How do I request a return or exchange?
+              </AccordionTrigger>
+              <AccordionContent>
+                Submit your request with proof of purchase or the order number.
+                You will receive an email shortly with the status of your
+                request.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4">
+              <AccordionTrigger>
+                Can I exchange an item for a different size?
+              </AccordionTrigger>
+              <AccordionContent>
+                Yes, you can exchange your item for a different size, provided
+                the requested size is in stock.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5">
+              <AccordionTrigger>
+                Can I cancel my order after placing it?
+              </AccordionTrigger>
+              <AccordionContent>
+                Yes, but you need to contact us immediately. Once an order is
+                dispatched, it cannot be canceled or changed.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
     </>
   );
 }

@@ -5,7 +5,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className=" bg-brandBeige text-black font-poppins border-t border-black/10">
+    <footer className="bg-black text-brandBeige font-poppins border-t border-brandBeige/10">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-row justify-between items-center">
           <div className="text-sm">© {currentYear} SALTY.</div>
@@ -16,7 +16,7 @@ export function Footer() {
                 href="https://facebook.com/salty.cai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-black hover:text-black/70 transition-colors p-2 sm:p-0"
+                className="text-brandBeige hover:text-brandBeige/70 transition-colors p-2 sm:p-0"
               >
                 <Facebook className="w-5 h-5 sm:w-4 sm:h-4" />
               </a>
@@ -24,7 +24,7 @@ export function Footer() {
                 href="https://instagram.com/salty.cai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-black hover:text-black/70 transition-colors p-2 sm:p-0"
+                className="text-brandBeige hover:text-brandBeige/70 transition-colors p-2 sm:p-0"
               >
                 <Instagram className="w-5 h-5 sm:w-4 sm:h-4" />
               </a>
@@ -32,7 +32,7 @@ export function Footer() {
 
             <a
               href="/pages/terms-conditions"
-              className="text-sm text-black hover:text-black/70 transition-colors"
+              className="text-sm text-brandBeige hover:text-brandBeige/70 transition-colors"
             >
               Terms
             </a>

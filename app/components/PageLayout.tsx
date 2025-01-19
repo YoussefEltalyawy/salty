@@ -14,6 +14,7 @@ import {
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import {Search} from 'lucide-react';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -82,9 +83,15 @@ function SearchAside() {
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-brandBeige focus:ring-2 focus:ring-brandBeige focus:ring-opacity-50 outline-none transition-all duration-200"
               />
               &nbsp;
-              <button onClick={goToSearch}>Search</button>
+              <button
+                onClick={goToSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              >
+                <Search className="w-6 h-6" />
+              </button>
             </>
           )}
         </SearchFormPredictive>

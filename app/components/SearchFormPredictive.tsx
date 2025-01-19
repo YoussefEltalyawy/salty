@@ -7,6 +7,7 @@ import {
 import React, {useRef, useEffect} from 'react';
 import type {PredictiveSearchReturn} from '~/lib/search';
 import {useAside} from './Aside';
+import {Search} from 'lucide-react';
 
 type SearchFormPredictiveChildren = (args: {
   fetchResults: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -21,9 +22,6 @@ type SearchFormPredictiveProps = Omit<FormProps, 'children'> & {
 
 export const SEARCH_ENDPOINT = '/search';
 
-/**
- *  Search form component that sends search requests to the `/search` route
- **/
 export function SearchFormPredictive({
   children,
   className = 'predictive-search-form',
@@ -34,7 +32,6 @@ export function SearchFormPredictive({
   const navigate = useNavigate();
   const aside = useAside();
 
-  /** Reset the input value and blur the input */
   function resetInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     event.stopPropagation();
@@ -43,14 +40,12 @@ export function SearchFormPredictive({
     }
   }
 
-  /** Navigate to the search page with the current input value */
   function goToSearch() {
     const term = inputRef?.current?.value;
     navigate(SEARCH_ENDPOINT + (term ? `?q=${term}` : ''));
     aside.close();
   }
 
-  /** Fetch search results based on the input value */
   function fetchResults(event: React.ChangeEvent<HTMLInputElement>) {
     fetcher.submit(
       {q: event.target.value || '', limit: 5, predictive: true},
@@ -58,8 +53,6 @@ export function SearchFormPredictive({
     );
   }
 
-  // ensure the passed input has a type of search, because SearchResults
-  // will select the element based on the input
   useEffect(() => {
     inputRef?.current?.setAttribute('type', 'search');
   }, []);
@@ -69,8 +62,14 @@ export function SearchFormPredictive({
   }
 
   return (
-    <fetcher.Form {...props} className={className} onSubmit={resetInput}>
-      {children({inputRef, fetcher, fetchResults, goToSearch})}
+    <fetcher.Form
+      {...props}
+      className={`${className} relative max-w-2xl mx-auto w-full font-poppins`}
+      onSubmit={resetInput}
+    >
+      <div className="relative flex">
+        {children({inputRef, fetcher, fetchResults, goToSearch})}
+      </div>
     </fetcher.Form>
   );
 }

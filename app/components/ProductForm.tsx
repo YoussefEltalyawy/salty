@@ -28,7 +28,7 @@ export function ProductForm({
             <h5 className="text-sm font-medium text-gray-900 uppercase tracking-wide">
               {option.name}
             </h5>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -44,15 +44,22 @@ export function ProductForm({
                 const baseClassName = `
                   relative
                   flex
+                  w-full
                   items-center
                   justify-center
-                  p-2
+                  p-3
                   rounded-lg
+                  border-2
                   transition-all
-                  duration-150
-                  ${available ? 'hover:bg-gray-50' : 'cursor-not-allowed'}
-                  ${selected ? 'ring-2 ring-black' : 'ring-1 ring-gray-200'}
-                  ${!available && 'opacity-40'}
+                  ${
+                    selected
+                      ? 'border-brandBeige bg-white text-gray-900'
+                      : 'border-transparent bg-gray-100 hover:bg-gray-200'
+                  }
+                  ${
+                    !available &&
+                    'opacity-50 cursor-not-allowed bg-gray-200 hover:bg-gray-200'
+                  }
                 `;
 
                 if (isDifferentProduct) {

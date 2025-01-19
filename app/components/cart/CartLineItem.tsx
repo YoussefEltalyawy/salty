@@ -67,7 +67,7 @@ export function CartLineItem({
           ))}
         </div>
         {/* Price & Quantity */}
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between gap-2">
           <CartLineQuantityAdjustor line={line} />
           <div className="text-base font-semibold text-black/90">
             <ProductPrice price={line?.cost?.totalAmount} />
@@ -89,25 +89,6 @@ export function CartLineItem({
  * when the line item is new, and the server hasn't yet responded
  * that it was successfully added to the cart.
  */
-function CartLineRemoveButton({
-  lineIds,
-  disabled,
-}: {
-  lineIds: string[];
-  disabled: boolean;
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.LinesRemove}
-      inputs={{lineIds}}
-    >
-      <button disabled={disabled} type="submit">
-        Remove
-      </button>
-    </CartForm>
-  );
-}
 
 function CartLineUpdateButton({
   children,

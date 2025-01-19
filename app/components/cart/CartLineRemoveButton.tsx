@@ -16,7 +16,7 @@ function CartLineRemoveButton({lineIds, disabled}: CartLineRemoveButtonProps) {
     >
       <button
         disabled={disabled}
-        className={`ml-3 text-gray-400 hover:text-gray-500 transition-colors ${
+        className={` text-gray-400 text-center hover:text-gray-500 transition-colors ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >

@@ -23,11 +23,11 @@ function CartEmpty({
 
         <p className="text-gray-500 mb-8">
           Looks like you haven&apos;t added anything yet, Feed it with some
-          amazing finds! 
+          amazing finds!
         </p>
 
         <Link
-          to="/collections"
+          to="/collections/all"
           onClick={close}
           prefetch="viewport"
           className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-black hover:bg-gray-800 transition-colors duration-200 rounded-full"

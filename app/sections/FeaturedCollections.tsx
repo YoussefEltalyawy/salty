@@ -21,7 +21,7 @@ function FeaturedCollections({
           viewport={{once: true}}
           className="text-center mb-12"
         >
-          <h2 className="text-6xl md:text-8xl lg:text-9xl font-bold  text-brandBeige mb-4">
+          <h2 className="text-4xl md:text-7xl lg:text-9xl font-bold mx-auto  text-brandBeige mb-4">
             SHOP BY COLLECTION
           </h2>
         </motion.div>

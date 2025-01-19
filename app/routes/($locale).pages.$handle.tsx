@@ -20,7 +20,7 @@ interface LoaderData {
  * Meta tags configuration for the page
  */
 export const meta: MetaFunction<typeof loader> = ({data}) => [
-  {title: `Hydrogen | ${data?.page.title ?? ''}`},
+  {title: `Salty | ${data?.page.title ?? ''}`},
   {description: data?.page.seo.description ?? ''},
 ];
 

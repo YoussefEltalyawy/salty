@@ -73,7 +73,7 @@ export const FlipWords = ({
             }}
             className="inline-block whitespace-nowrap text-white"
             style={{
-              letterSpacing: '-0.05em', // Reduced letter spacing
+              letterSpacing: '-0.02em', // Reduced letter spacing
             }}
           >
             {word.split('').map((letter, letterIndex) => (
@@ -90,7 +90,6 @@ export const FlipWords = ({
                 {letter}
               </motion.span>
             ))}
-            <span className="inline-block">&nbsp;</span>
           </motion.span>
         ))}
       </motion.div>

@@ -19,7 +19,7 @@ import FeaturedCollections from '~/sections/FeaturedCollections';
 import ShopTheFit from '~/sections/ShopTheFit';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [{title: 'Salty | Home'}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -159,16 +159,16 @@ function RecommendedProducts({
               animate={scrollControls}
               className="flex whitespace-nowrap"
             >
-              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins font-semibold uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins font-semibold uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins font-semibold uppercase shrink-0">
                 Best Sellers&nbsp;
               </h2>
-              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins uppercase shrink-0">
+              <h2 className="text-black text-[100px] sm:text-[150px] md:text-[200px] lg:text-[400px] font-poppins font-semibold uppercase shrink-0">
                 Sellers Best&nbsp;
               </h2>
             </motion.div>

@@ -53,7 +53,7 @@ export function AddToCartButton({
               type="submit"
               onClick={onClick}
               disabled={disabled ?? isLoading}
-              className={`w-full py-5 px-8 text-brandBeige text-base tracking-wider uppercase transition-all duration-300 ease-in-out flex items-center justify-center text-center relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-white/10 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 disabled:before:hidden bg-black hover:bg-black/70 
+              className={`w-full py-5 px-8 rounded-md text-brandBeige text-base tracking-wider uppercase transition-all duration-300 ease-in-out flex items-center justify-center text-center relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-white/10 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 disabled:before:hidden bg-black hover:bg-black/70 
                 disabled:bg-black/30 disabled:text-black disabled:cursor-not-allowed`}
             >
               {isLoading ? (

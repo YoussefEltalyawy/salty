@@ -49,7 +49,7 @@ export function CartLineItem({
           onClick={close}
           className="block"
         >
-          <h3 className="text-base text-black/90 mb-1 truncate">
+          <h3 className="text-base font-semibold text-black/90 mb-1 truncate">
             {product.title}
           </h3>
         </Link>
@@ -61,14 +61,15 @@ export function CartLineItem({
               key={`${product.id}-${option.name}`}
               className="text-sm text-black/60"
             >
-              {option.name}: {option.value}
+              {option.name}:{' '}
+              <span className="font-semibold">{option.value}</span>
             </p>
           ))}
         </div>
         {/* Price & Quantity */}
         <div className="mt-4 flex items-center justify-between">
           <CartLineQuantityAdjustor line={line} />
-          <div className="text-base text-black/90">
+          <div className="text-base font-semibold text-black/90">
             <ProductPrice price={line?.cost?.totalAmount} />
           </div>
         </div>

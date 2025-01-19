@@ -15,7 +15,7 @@ import {Suspense} from 'react';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {title: `Salty | ${data?.product.title ?? ''}`},
     {
       rel: 'canonical',
       href: `/products/${data?.product.handle}`,
@@ -120,7 +120,7 @@ export default function Product() {
           <div className="space-y-10">
             {/* Product Title & Price */}
             <div className="space-y-4 pb-0">
-              <h1 className="text-2xl md:text-4xl lg:text-5xl text-black/90">
+              <h1 className="text-2xl font-semibold md:text-4xl lg:text-5xl text-black/90">
                 {product.title}
               </h1>
               <ProductPrice

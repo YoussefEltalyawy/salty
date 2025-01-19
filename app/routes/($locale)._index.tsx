@@ -129,7 +129,7 @@ export default function Homepage() {
 
       {/* FAQ Section */}
       <section className="w-full bg-brandBeige py-16">
-        <div className="mx-4 px-4">
+        <div className="mx-2 px-4">
           <h2 className="mb-8 text-center text-3xl font-bold">FAQ</h2>
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1">

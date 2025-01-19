@@ -46,17 +46,6 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
-      {/* Remove From Here */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none font-poppins z-50">
-        <div className="flex flex-col items-center transform">
-          <span className="text-red-800 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold opacity-40">
-            talyawy.dev
-          </span>
-          <p className="text-red-800 font-bold text-sm sm:text-base md:text-lg lg:text-xl opacity-40 mt-2 sm:mt-4">
-            Please complete payment to remove watermark
-          </p>
-        </div>
-      </div>
 
       <main>{children}</main>
       <Footer />

@@ -1,5 +1,11 @@
 import {Suspense, useEffect, useState} from 'react';
-import {Await, NavLink, useAsyncValue, useLocation} from '@remix-run/react';
+import {
+  Await,
+  Link,
+  NavLink,
+  useAsyncValue,
+  useLocation,
+} from '@remix-run/react';
 import {
   type CartViewPayload,
   Image,
@@ -44,7 +50,9 @@ export function Header({
       {/* Left Section */}
       <div className="flex items-center space-x-4">
         <HeaderMenuMobileToggle />
-        <User className="w-6 h-6 lg:w-7 lg:h-7" />
+        <Link to="/account" prefetch="intent">
+          <User className="w-6 h-6 lg:w-7 lg:h-7" />
+        </Link>
       </div>
 
       {/* Center Section - Logo */}

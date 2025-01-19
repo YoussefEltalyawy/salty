@@ -1,6 +1,7 @@
 import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Form, NavLink, Outlet, useLoaderData} from '@remix-run/react';
 import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetailsQuery';
+import {motion} from 'motion/react';
 
 export function shouldRevalidate() {
   return true;
@@ -31,49 +32,58 @@ export default function AccountLayout() {
   const heading = customer
     ? customer.firstName
       ? `Welcome, ${customer.firstName}`
-      : `Welcome to your account.`
+      : `Welcome to your account`
     : 'Account Details';
 
   return (
-    <div className="account">
-      <h1>{heading}</h1>
-      <br />
-      <AccountMenu />
-      <br />
-      <br />
-      <Outlet context={{customer}} />
+    <div className="min-h-screen bg-white font-poppins">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div
+          initial={{opacity: 0, y: 20}}
+          animate={{opacity: 1, y: 0}}
+          transition={{duration: 0.6}}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            {heading}
+          </h1>
+        </motion.div>
+        <AccountMenu />
+        <div className="mt-12">
+          <Outlet context={{customer}} />
+        </div>
+      </div>
     </div>
   );
 }
 
 function AccountMenu() {
-  function isActiveStyle({
+  const linkClass = ({
     isActive,
     isPending,
   }: {
     isActive: boolean;
     isPending: boolean;
-  }) {
-    return {
-      fontWeight: isActive ? 'bold' : undefined,
-      color: isPending ? 'grey' : 'black',
-    };
-  }
+  }) =>
+    `px-4 py-2 rounded-full transition-colors duration-200 ${
+      isActive
+        ? 'bg-gray-900 text-white'
+        : isPending
+        ? 'bg-gray-100 text-gray-900'
+        : 'text-gray-600 hover:text-gray-900'
+    }`;
 
   return (
-    <nav role="navigation">
-      <NavLink to="/account/orders" style={isActiveStyle}>
-        Orders &nbsp;
+    <nav className="flex flex-wrap justify-center gap-4" role="navigation">
+      <NavLink to="/account/orders" className={linkClass}>
+        Orders
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/profile" style={isActiveStyle}>
-        &nbsp; Profile &nbsp;
+      <NavLink to="/account/profile" className={linkClass}>
+        Profile
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/addresses" style={isActiveStyle}>
-        &nbsp; Addresses &nbsp;
+      <NavLink to="/account/addresses" className={linkClass}>
+        Addresses
       </NavLink>
-      &nbsp;|&nbsp;
       <Logout />
     </nav>
   );
@@ -81,8 +91,13 @@ function AccountMenu() {
 
 function Logout() {
   return (
-    <Form className="account-logout" method="POST" action="/account/logout">
-      &nbsp;<button type="submit">Sign out</button>
+    <Form method="POST" action="/account/logout">
+      <button
+        type="submit"
+        className="px-4 py-2 rounded-full text-gray-600 hover:text-gray-900 transition-colors duration-200"
+      >
+        Sign out
+      </button>
     </Form>
   );
 }

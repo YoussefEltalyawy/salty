@@ -10,6 +10,11 @@ function FeaturedCollections({
   collections: FeaturedCollectionFragment[];
 }) {
   if (!collections?.length) return null;
+  const collectionsWithImages = collections?.filter(
+    (collection) => collection.image,
+  );
+
+  if (!collectionsWithImages?.length) return null;
 
   return (
     <section className="bg-black py-12 font-poppins">
@@ -27,7 +32,7 @@ function FeaturedCollections({
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {collections.map((collection, index) => (
+          {collectionsWithImages.map((collection, index) => (
             <motion.div
               key={collection.id}
               initial={{opacity: 0, y: 30}}

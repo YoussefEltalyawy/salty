@@ -53,7 +53,7 @@ export function PageLayout({
             talyawy.dev
           </span>
           <p className="text-red-800 font-bold text-sm sm:text-base md:text-lg lg:text-xl opacity-40 mt-2 sm:mt-4">
-            Please complement payment to remove watermark
+            Please complete payment to remove watermark
           </p>
         </div>
       </div>

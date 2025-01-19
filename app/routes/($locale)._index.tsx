@@ -16,7 +16,13 @@ import {
 } from 'motion/react';
 import FeaturedCollections from '~/sections/FeaturedCollections';
 import ShopTheFit from '~/sections/ShopTheFit';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
+import {MoveRight} from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Salty | Home'}];
@@ -94,20 +100,27 @@ export default function Homepage() {
           <FlipWords words={words} /> <br />
         </div>
 
-        <div className="hidden md:inline-block absolute bottom-20 right-10">
-          <div className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer border border-[#BEB1A1] py-2 px-4 rounded-full">
-            <Link
-              to="/collections/w24"
-              className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer"
-            >
+        <div className="absolute bottom-20 right-10">
+          <Link
+            to="/collections/w24"
+            className="flex items-center gap-2 transition-colors cursor-pointer"
+          >
+            {/* Desktop view: Show text and border */}
+            <div className="hidden md:flex items-center gap-2 border border-[#BEB1A1] py-2 px-4 rounded-full text-white/70 hover:text-white transition-colors">
               <p className="font-light tracking-wider text-m italic">
                 Discover more
               </p>
               <span className="transform transition-transform group-hover:translate-x-1">
                 →
               </span>
-            </Link>
-          </div>
+            </div>
+            {/* Mobile view: Show circular button */}
+            <div className="flex md:hidden w-10 h-10 bg-brandBeige rounded-full items-center justify-center text-[#BEB1A1] hover:text-white transition-colors">
+              <span className="text-black/70">
+                <MoveRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
         </div>
       </section>
       <RecommendedProducts products={data.recommendedProducts} />

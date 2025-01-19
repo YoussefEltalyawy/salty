@@ -1,6 +1,6 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense, useEffect, useRef} from 'react';
+import {Suspense, useEffect, useRef, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
@@ -54,19 +54,34 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   const words = ['SALTY', 'ELEGANT', 'BOLD'];
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   return (
     <>
       <section className="relative h-screen w-full font-poppins">
+        {/* Placeholder image */}
+        <div
+          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-500 ${
+            isVideoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
+          style={{
+            backgroundImage: "url('/placeholder-hero.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+
         <video
           autoPlay
           loop
           muted
           playsInline
+          onLoadedData={() => setIsVideoLoaded(true)}
           className="absolute top-0 left-0 w-full h-full object-cover"
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
+
         <div className="absolute inset-0 bg-black/40"></div>
 
         <div className="hidden md:block absolute bottom-20 left-10 text-6xl font-bold text-white">

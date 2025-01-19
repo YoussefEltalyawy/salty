@@ -13,7 +13,7 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <div className="flex md:gap-4">
               <a
-                href="https://facebook.com/salty"
+                href="https://facebook.com/salty.cai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black hover:text-black/70 transition-colors p-2 sm:p-0"
@@ -21,20 +21,12 @@ export function Footer() {
                 <Facebook className="w-5 h-5 sm:w-4 sm:h-4" />
               </a>
               <a
-                href="https://instagram.com/salty"
+                href="https://instagram.com/salty.cai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-black hover:text-black/70 transition-colors p-2 sm:p-0"
               >
                 <Instagram className="w-5 h-5 sm:w-4 sm:h-4" />
-              </a>
-              <a
-                href="https://twitter.com/salty"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-black hover:text-black/70 transition-colors p-2 sm:p-0"
-              >
-                <Twitter className="w-5 h-5 sm:w-4 sm:h-4" />
               </a>
             </div>
 

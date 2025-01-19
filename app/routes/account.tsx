@@ -1,17 +1,30 @@
 import {Form, useLoaderData} from '@remix-run/react';
-import {type LoaderFunctionArgs, json} from '@shopify/remix-oxygen';
+import {type LoaderFunctionArgs, json, redirect} from '@shopify/remix-oxygen';
 
 export async function loader({context}: LoaderFunctionArgs) {
+  const customerAccessToken = await context.session.get('customerAccessToken');
+
+  if (!customerAccessToken?.accessToken) {
+    return redirect('/account/login');
+  }
+
   const {data, errors} = await context.customerAccount.query<{
     customer: {firstName: string; lastName: string};
-  }>(`#graphql
-      query getCustomer {
-        customer {
+  }>(
+    `#graphql
+      query getCustomer($customerAccessToken: String!) {
+        customer(customerAccessToken: $customerAccessToken) {
           firstName
           lastName
         }
       }
-      `);
+    `,
+    {
+      variables: {
+        customerAccessToken: customerAccessToken.accessToken,
+      },
+    },
+  );
 
   if (errors?.length || !data?.customer) {
     throw new Error('Customer not found');

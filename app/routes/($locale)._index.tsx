@@ -96,7 +96,7 @@ export default function Homepage() {
         <div className="hidden md:inline-block absolute bottom-20 right-10">
           <div className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer border border-[#BEB1A1] py-2 px-4 rounded-full">
             <Link
-              to="#recommended-products"
+              to="/collections/w24"
               className="group flex text-lg items-center gap-2 text-white/70 hover:text-white transition-colors cursor-pointer"
             >
               <p className="font-light tracking-wider text-m italic">

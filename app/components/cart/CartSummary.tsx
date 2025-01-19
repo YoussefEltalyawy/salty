@@ -2,9 +2,10 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/cart/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useRef} from 'react';
-import type {FetcherWithComponents} from '@remix-run/react';
-import {X} from 'lucide-react';
+import {Link, type FetcherWithComponents} from '@remix-run/react';
+import {ArrowRight, X} from 'lucide-react';
 import CartDiscounts from './CartDiscounts';
+import {useAside} from '../Aside';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -12,6 +13,7 @@ type CartSummaryProps = {
 };
 
 export function CartSummary({cart, layout}: CartSummaryProps) {
+  const {close} = useAside();
   const isPage = layout === 'page';
   // fixed bottom-4 left-4 z-50 w-full pr-8
   return (
@@ -23,6 +25,16 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     >
       <div className="p-4">
         <div className="space-y-3">
+          {/* Continue Shopping */}
+          <Link
+            to="/collections/all"
+            onClick={close}
+            className="flex items-center justify-between px-4 py-2 text-sm font-medium transition-colors bg-brandBeige rounded-md hover:bg-brandBeige/80"
+          >
+            Continue Shopping
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+
           {/* Subtotal */}
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Subtotal</span>
@@ -34,11 +46,6 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
               )}
             </span>
           </div>
-
-          {/* Discounts */}
-
-          {/* Gift Cards */}
-
           {/* Checkout Button */}
           <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
         </div>

@@ -129,8 +129,10 @@ export default function Homepage() {
 
       {/* FAQ Section */}
       <section className="w-full bg-brandBeige py-16">
-        <div className="mx-2 px-4">
-          <h2 className="mb-8 text-center text-3xl font-bold">FAQ</h2>
+        <div className="mx-1 px-4">
+          <h2 className="text-4xl md:text-7xl lg:text-9xl font-bold mx-auto text-black mb-4">
+            FAQ
+          </h2>
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1">
               <AccordionTrigger>
@@ -144,7 +146,7 @@ export default function Homepage() {
 
             <AccordionItem value="item-2">
               <AccordionTrigger>
-                Can I return or exchange items purchased online?
+                Can I return / exchange items purchased online?
               </AccordionTrigger>
               <AccordionContent>
                 Yes, returns and exchanges are available for online purchases

@@ -14,12 +14,12 @@ export function Footer() {
             <span className="text-sm md:before:content-['•'] md:before:mx-2 md:before:text-brandBeige/50">
               Developed by{' '}
               <a
-                href="https://bio.site/youssefeltalyawy"
+                href="https://talyawy.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-brandBeige font-black hover:text-brandBeige/70 transition-colors underline-offset-4 hover:underline"
               >
-                @yousefeltalyawy
+                @talyawy.dev
               </a>
             </span>
           </div>

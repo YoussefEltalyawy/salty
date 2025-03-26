@@ -102,7 +102,7 @@ export default function Homepage() {
 
         <div className="absolute bottom-20 right-10">
           <Link
-            to="/collections/w24"
+            to="/collections/s25-collection"
             className="flex items-center gap-2 transition-colors cursor-pointer"
           >
             {/* Desktop view: Show text and border */}

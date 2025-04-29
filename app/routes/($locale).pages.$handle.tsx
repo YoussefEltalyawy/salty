@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {defer, type LoaderFunctionArgs, redirect} from '@shopify/remix-oxygen';
 import {useLoaderData, type MetaFunction} from '@remix-run/react';
 
 interface PageData {
@@ -29,6 +29,13 @@ export const meta: MetaFunction<typeof loader> = ({data}) => [
  * @param args - Loader function arguments from Remix
  */
 export async function loader(args: LoaderFunctionArgs) {
+  const {params} = args;
+
+  // Redirect to home page if handle is "lock-with-password"
+  if (params.handle === 'lock-with-password') {
+    return redirect('/');
+  }
+
   const [criticalData, deferredData] = await Promise.all([
     loadCriticalData(args),
     loadDeferredData(args),

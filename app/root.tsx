@@ -11,6 +11,11 @@ import {
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
 } from '@remix-run/react';
+import {LOCK_PAGE_QUERY} from '~/graphql/lockQuery';
+import {useState, useEffect} from 'react';
+import {LockScreen} from '~/components/LockScreen';
+import {safeLocalStorage} from '~/lib/utils';
+
 import favicon from '~/assets/favicon.png';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -21,6 +26,12 @@ import '@fontsource/poppins/400.css';
 import '@fontsource/poppins/500.css';
 import '@fontsource/poppins/600.css';
 import '@fontsource/poppins/700.css';
+
+// Define type for metafield
+type Metafield = {
+  key: string;
+  value: string;
+};
 
 export type RootLoader = typeof loader;
 
@@ -94,17 +105,31 @@ export async function loader(args: LoaderFunctionArgs) {
 async function loadCriticalData({context}: LoaderFunctionArgs) {
   const {storefront} = context;
 
-  const [header] = await Promise.all([
+  const [header, lockData] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheNone(),
       variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        headerMenuHandle: 'main-menu',
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
+    storefront.query(LOCK_PAGE_QUERY, {
+      cache: storefront.CacheNone(),
+    }),
   ]);
 
-  return {header};
+  const metafields = lockData?.page?.metafields || [];
+  const storeLockedMetafield = metafields.find(
+    (m: Metafield) => m && m.key === 'store_locked',
+  );
+  // Only treat as locked if the store_locked metafield exists AND is set to 'true'
+  const storeLocked = storeLockedMetafield?.value === 'true';
+
+  // Get the password value if it exists
+  const storePassword =
+    metafields.find((m: Metafield) => m && m.key === 'store_password')?.value ||
+    '';
+
+  return {header, storeLocked, storePassword};
 }
 
 /**
@@ -138,6 +163,54 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
+  // Add a loading state to prevent flash
+  const [isChecking, setIsChecking] = useState(true);
+  const [isLocked, setIsLocked] = useState(true);
+
+  useEffect(() => {
+    // As soon as we have the data, we can check the status
+    if (data) {
+      // Only lock the website if store_locked is true AND store_password is defined and not empty
+      const shouldLock =
+        data.storeLocked === true &&
+        typeof data.storePassword === 'string' &&
+        data.storePassword.trim() !== '';
+
+      // Check if the user has already entered the correct password when website should be locked
+      const hasAccess =
+        safeLocalStorage.getItem('storeAccessGranted') === 'true';
+
+      if (hasAccess || !shouldLock) {
+        setIsLocked(false);
+      }
+
+      // Only finish checking once we have the data
+      setIsChecking(false);
+    }
+  }, [data]);
+
+  const handlePasswordSuccess = () => {
+    setIsLocked(false);
+  };
+
+  // Don't render anything until we've checked authentication status
+  // This prevents the lock screen from flashing
+  if (isChecking || !data) {
+    return (
+      <html lang="en">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <ScrollRestoration nonce={nonce} />
+          <Scripts nonce={nonce} />
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="en">
@@ -152,7 +225,15 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Links />
       </head>
       <body>
-        {data ? (
+        {data.storeLocked === true &&
+        typeof data.storePassword === 'string' &&
+        data.storePassword.trim() !== '' &&
+        isLocked ? (
+          <LockScreen
+            correctPassword={data.storePassword}
+            onPasswordSuccess={handlePasswordSuccess}
+          />
+        ) : (
           <Analytics.Provider
             cart={data.cart}
             shop={data.shop}
@@ -160,8 +241,6 @@ export function Layout({children}: {children?: React.ReactNode}) {
           >
             <PageLayout {...data}>{children}</PageLayout>
           </Analytics.Provider>
-        ) : (
-          children
         )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />

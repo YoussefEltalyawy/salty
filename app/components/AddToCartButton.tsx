@@ -1,8 +1,12 @@
 import {type FetcherWithComponents} from '@remix-run/react';
-import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
+import {
+  CartForm,
+  type OptimisticCartLineInput,
+  useAnalytics,
+} from '@shopify/hydrogen';
 import {time} from 'framer-motion';
 import {Check, Loader2} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 
 export function AddToCartButton({
   analytics,
@@ -20,7 +24,32 @@ export function AddToCartButton({
   afterAddToCart?: () => void;
 }) {
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
+  const {publish, shop} = useAnalytics();
 
+  // Track fetcher state changes
+  const [fetcherState, setFetcherState] = useState<string>('idle');
+  const [fetcherData, setFetcherData] = useState<any>(null);
+  const [fetcherError, setFetcherError] = useState<boolean>(false);
+
+  // Handle cart add success
+  const handleCartAddSuccess = () => {
+    setAddedToCart(true);
+
+    // Publish analytics event for product added to cart
+    if (analytics) {
+      publish('custom_product_added', {
+        products: Array.isArray(analytics) ? analytics : [analytics],
+        shop,
+        url: window.location.href || '',
+      });
+    }
+
+    if (afterAddToCart) {
+      afterAddToCart();
+    }
+  };
+
+  // Effect for automatic timeout to reset addedToCart
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (addedToCart) {
@@ -30,18 +59,28 @@ export function AddToCartButton({
     }
     return () => clearTimeout(timeout);
   }, [addedToCart]);
+
+  // Effect to handle fetcher state changes
+  useEffect(() => {
+    if (fetcherState === 'idle' && fetcherData && !fetcherError) {
+      handleCartAddSuccess();
+    }
+  }, [fetcherState, fetcherData, fetcherError]);
+
   return (
     <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
       {(fetcher) => {
         const isLoading = fetcher.state !== 'idle';
-        useEffect(() => {
-          if (fetcher.state === 'idle' && fetcher.data && !fetcher.data.error) {
-            setAddedToCart(true);
-            if (afterAddToCart) {
-              afterAddToCart();
-            }
-          }
-        }, [fetcher.state, fetcher.data]);
+
+        // Update fetcher state for the effect to work with
+        if (fetcherState !== fetcher.state) {
+          setFetcherState(fetcher.state);
+        }
+        if (fetcherData !== fetcher.data) {
+          setFetcherData(fetcher.data);
+          setFetcherError(!!fetcher.data?.error);
+        }
+
         return (
           <div className="relative">
             <input

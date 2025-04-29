@@ -1,6 +1,11 @@
 import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
+import {
+  getPaginationVariables,
+  Image,
+  Money,
+  Analytics,
+} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -81,6 +86,15 @@ export default function Collection() {
             />
           )}
         </PaginatedResourceSection>
+
+        <Analytics.CollectionView
+          data={{
+            collection: {
+              id: collection.id,
+              handle: collection.handle,
+            },
+          }}
+        />
       </div>
     </div>
   );

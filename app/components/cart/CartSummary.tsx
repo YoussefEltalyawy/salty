@@ -1,6 +1,11 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/cart/CartMain';
-import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
+import {
+  CartForm,
+  Money,
+  type OptimisticCart,
+  useAnalytics,
+} from '@shopify/hydrogen';
 import {useRef} from 'react';
 import {Link, type FetcherWithComponents} from '@remix-run/react';
 import {ArrowRight, X} from 'lucide-react';
@@ -55,12 +60,25 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 }
 
 function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+  const {publish, shop, cart} = useAnalytics();
+
   if (!checkoutUrl) return null;
+
+  const handleCheckout = (e: React.MouseEvent) => {
+    // Publish checkout started event
+    publish('custom_checkout_started', {
+      cart,
+      shop,
+      url: window.location.href || '',
+      checkoutUrl,
+    });
+  };
 
   return (
     <a
       href={checkoutUrl}
       target="_self"
+      onClick={handleCheckout}
       className="block w-full bg-black text-white text-center py-2.5 px-4 rounded-md hover:bg-gray-800 transition-colors mt-4"
     >
       Continue to Checkout

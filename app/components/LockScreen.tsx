@@ -34,7 +34,8 @@ export function LockScreen({
         </h2>
 
         <p className="text-gray-600 mb-6 text-center">
-          This store is currently locked and requires a password to access.
+          If you&apos;re a Salty Club Member You&apos;ll have the password to
+          join!
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

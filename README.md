@@ -1,45 +1,66 @@
-# Hydrogen template: Skeleton
+# Salty - Headless Shopify Storefront
 
-Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **minimal setup** of components, queries and tooling to get started with Hydrogen.
+A modern headless e-commerce storefront built with Shopify's Hydrogen framework and Remix. This project demonstrates a complete Shopify integration with TypeScript, featuring customer accounts, advanced search, and a sophisticated UI.
 
-[Check out Hydrogen docs](https://shopify.dev/custom-storefronts/hydrogen)
-[Get familiar with Remix](https://remix.run/docs/en/v1)
+## 🏛️ About Salty
 
-## What's included
+At **Salty**, we're all about that old-money style with a touch of streetwear. It's like combining the elegance of the past with a modern twist. The result? A unique and stylish collection that captures the best of both worlds.
 
-- Remix
-- Hydrogen
-- Oxygen
-- Vite
-- Shopify CLI
-- ESLint
-- Prettier
-- GraphQL generator
-- TypeScript and JavaScript flavors
-- Minimal setup of components and routes
+Salty offers fashion that exudes sophistication while still being edgy and cool. It's the perfect blend for those who appreciate a classic aesthetic with a contemporary vibe.
 
-## Getting started
+## 🛠️ Tech Stack
 
-**Requirements:**
+- **Framework**: [Hydrogen](https://shopify.dev/custom-storefronts/hydrogen) (Shopify's React framework)
+- **Runtime**: [Remix](https://remix.run/) (Full-stack web framework)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom animations
+- **UI Components**: Radix UI primitives
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Fonts**: Poppins (Google Fonts)
+- **Deployment**: Shopify Oxygen (Cloudflare Workers)
 
-- Node.js version 18.0.0 or higher
+## ✨ Key Features
 
-```bash
-npm create @shopify/hydrogen@latest
+- **Customer Account Management**: Full profile, orders, and address management
+- **Advanced Search**: Predictive search with real-time results
+- **Product Experience**: Collections, filtering, variants, and cart management
+- **Content Management**: Blog, articles, and policy pages
+- **SEO Optimized**: Built-in SEO features with sitemaps and meta tags
+- **Responsive Design**: Optimized for all devices
+- **TypeScript**: Full type safety throughout
+
+## 📁 Project Structure
+
+```
+salty-v3/
+├── app/
+│   ├── components/          # Reusable UI components
+│   │   ├── ui/             # Base UI components (Radix UI)
+│   │   ├── cart/           # Cart-related components
+│   │   └── lib/            # Component utilities
+│   ├── routes/             # Remix routes (pages)
+│   ├── sections/           # Page sections
+│   ├── graphql/            # GraphQL queries and mutations
+│   ├── lib/                # Utility functions
+│   ├── styles/             # Global styles
+│   └── assets/             # Static assets
+├── public/                 # Public assets
+└── .shopify/              # Shopify configuration
 ```
 
-## Building for production
 
-```bash
-npm run build
-```
+## 📈 Performance Features
 
-## Local development
+- Server-side rendering (SSR)
+- Static site generation (SSG)
+- Image optimization
+- Code splitting and lazy loading
+- GraphQL query optimization
 
-```bash
-npm run dev
-```
+---
 
-## Setup for using Customer Account API (`/account` section)
+<div align="center">
 
-Follow step 1 and 2 of <https://shopify.dev/docs/custom-storefronts/building-with-the-customer-account-api/hydrogen#step-1-set-up-a-public-domain-for-local-development>
+  <p>Built with ❤️ using Hydrogen and Remix</p>
+</div>

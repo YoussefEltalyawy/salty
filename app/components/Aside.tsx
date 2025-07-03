@@ -61,12 +61,12 @@ export function Aside({
   useEffect(() => {
     if (!expanded) return;
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'ESC') {
+      if (event.key === 'Escape') {
         close();
       }
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
     };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [expanded, close]);
   return (
     <div

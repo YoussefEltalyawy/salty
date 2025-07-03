@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
 import {
   getPaginationVariables,
@@ -16,9 +16,16 @@ export const meta: MetaFunction<typeof loader> = () => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  const deferredData = loadDeferredData(args);
-  const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  // Load all data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
+
+  return {
+    ...criticalData,
+    ...deferredData,
+  };
 }
 
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
@@ -35,7 +42,9 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   return {products};
 }
 
-function loadDeferredData({context}: LoaderFunctionArgs) {
+async function loadDeferredData({context}: LoaderFunctionArgs) {
+  // This function can be used to load any non-critical data
+  // that can be loaded after the initial page render
   return {};
 }
 
@@ -99,8 +108,8 @@ function ProductItem({
 
   return (
     <motion.div
-      initial={{opacity: 0, y: 20}}
-      animate={{opacity: 1, y: 0}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.5,
         delay: index * 0.1,

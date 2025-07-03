@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, type MetaFunction} from '@remix-run/react';
 import {
   getSelectedProductOptions,
@@ -24,13 +24,16 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  // Load all data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
 
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return defer({...deferredData, ...criticalData});
+  return {
+    ...criticalData,
+    ...deferredData,
+  };
 }
 
 /**
@@ -49,20 +52,42 @@ async function loadCriticalData({
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}] = await Promise.all([
-    storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
-    }),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+  const selectedOptions = getSelectedProductOptions(request);
+  try {
+    const {product} = await storefront.query(PRODUCT_QUERY, {
+      variables: {
+        handle,
+        selectedOptions,
+        country: context.storefront.i18n.country,
+        language: context.storefront.i18n.language,
+      },
+    });
 
-  if (!product?.id) {
-    throw new Response(null, {status: 404});
+    if (!product?.id) {
+      throw new Response(null, {status: 404});
+    }
+
+    // Get recommended products for the product page
+    const {productRecommendations} = await storefront.query(
+      RECOMMENDED_PRODUCTS_QUERY,
+      {
+        variables: {
+          productId: product.id,
+          country: context.storefront.i18n.country,
+          language: context.storefront.i18n.language,
+        },
+      },
+    );
+
+    return {
+      product,
+      recommendedProducts: productRecommendations,
+      selectedVariant: product.selectedOrFirstAvailableVariant,
+    };
+  } catch (error) {
+    console.error('Error loading product:', error);
+    throw error;
   }
-
-  return {
-    product,
-  };
 }
 
 /**
@@ -70,10 +95,9 @@ async function loadCriticalData({
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context, params}: LoaderFunctionArgs) {
-  // Put any API calls that is not critical to be available on first page render
-  // For example: product reviews, product recommendations, social feeds.
-
+async function loadDeferredData({context, params}: LoaderFunctionArgs) {
+  // This function can be used to load any non-critical data
+  // that can be loaded after the initial page render
   return {};
 }
 
@@ -131,30 +155,26 @@ export default function Product() {
             </div>
 
             {/* Product Form */}
-            <ProductForm
-              productOptions={productOptions}
-              selectedVariant={selectedVariant}
-            />
-
-            {/* Product Description */}
-            <div className="font-poppins text-black/90 max-w-none">
-              <div
-                dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
-              ></div>
+            <div className="border-t border-gray-200 pt-6">
+              <ProductForm
+                productOptions={productOptions}
+                selectedVariant={selectedVariant}
+                productHandle={product.handle}
+              />
             </div>
 
-            {/* <Suspense>
-              <Await resolve={variants}>
-                {(data) => (
-                  <ProductForm
-                    product={product}
-                    selectedVariant={selectedVariant}
-                    variants={data?.product?.variants.nodes || []}
-                    className="space-y-8"
-                  />
-                )}
-              </Await>
-            </Suspense> */}
+            {/* Product Description */}
+            {descriptionHtml && (
+              <div className="border-t border-gray-200 pt-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">
+                  Product Details
+                </h2>
+                <div
+                  className="prose max-w-none text-gray-600"
+                  dangerouslySetInnerHTML={{__html: descriptionHtml}}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -188,7 +208,7 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
     image {
       __typename
       id
-      url
+      url(transform: {maxWidth: 1200, maxHeight: 1200, crop: CENTER})
       altText
       width
       height
@@ -210,6 +230,56 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
     unitPrice {
       amount
       currencyCode
+    }
+    quantityAvailable
+    sellingPlanAllocations(first: 10) {
+      edges {
+        node {
+          priceAdjustments {
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            price {
+              amount
+              currencyCode
+            }
+            unitPrice {
+              amount
+              currencyCode
+            }
+          }
+          sellingPlan {
+            id
+            name
+            description
+            options {
+              name
+              value
+            }
+            priceAdjustments {
+              orderCount
+              adjustmentValue {
+                ... on SellingPlanFixedAmountPriceAdjustment {
+                  adjustmentAmount {
+                    amount
+                    currencyCode
+                  }
+                }
+                ... on SellingPlanFixedPriceAdjustment {
+                  price {
+                    amount
+                    currencyCode
+                  }
+                }
+                ... on SellingPlanPercentagePriceAdjustment {
+                  adjustmentPercentage
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 ` as const;
@@ -276,4 +346,33 @@ const PRODUCT_QUERY = `#graphql
     }
   }
   ${PRODUCT_FRAGMENT}
+` as const;
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  query productRecommendations(
+    $productId: ID!
+    $country: CountryCode
+    $language: LanguageCode
+    $intent: ProductRecommendationIntent = RELATED
+  ) @inContext(country: $country, language: $language) {
+    productRecommendations(productId: $productId, intent: $intent) {
+      id
+      title
+      handle
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 1) {
+        nodes {
+          url(transform: {maxWidth: 300, maxHeight: 300, crop: CENTER})
+          altText
+          width
+          height
+        }
+      }
+    }
+  }
 ` as const;

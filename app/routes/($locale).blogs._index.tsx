@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Link, useLoaderData, type MetaFunction} from '@remix-run/react';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -8,13 +8,16 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  // Load all data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
 
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
-  return defer({...deferredData, ...criticalData});
+  return {
+    ...criticalData,
+    ...deferredData,
+  };
 }
 
 /**
@@ -43,7 +46,9 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context}: LoaderFunctionArgs) {
+async function loadDeferredData({context}: LoaderFunctionArgs) {
+  // This function can be used to load any non-critical data
+  // that can be loaded after the initial page render
   return {};
 }
 
@@ -57,10 +62,9 @@ export default function Blogs() {
         <PaginatedResourceSection connection={blogs}>
           {({node: blog}) => (
             <Link
-              className="blog"
               key={blog.handle}
-              prefetch="intent"
               to={`/blogs/${blog.handle}`}
+              className="block"
             >
               <h2>{blog.title}</h2>
             </Link>

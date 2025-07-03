@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
 import {Suspense, useEffect, useRef, useState} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
@@ -29,9 +29,16 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  const deferredData = loadDeferredData(args);
-  const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  // Load all data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
+
+  return {
+    ...criticalData,
+    ...deferredData,
+  };
 }
 
 export async function loadCriticalData({context}: LoaderFunctionArgs) {
@@ -44,17 +51,16 @@ export async function loadCriticalData({context}: LoaderFunctionArgs) {
   };
 }
 
-function loadDeferredData({context}: LoaderFunctionArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error) => {
-      console.error(error);
-      return null;
-    });
-
-  return {
-    recommendedProducts,
-  };
+async function loadDeferredData({context}: LoaderFunctionArgs) {
+  try {
+    const recommendedProducts = await context.storefront.query(
+      RECOMMENDED_PRODUCTS_QUERY,
+    );
+    return {recommendedProducts};
+  } catch (error) {
+    console.error('Failed to load recommended products', error);
+    return {recommendedProducts: null};
+  }
 }
 
 export default function Homepage() {

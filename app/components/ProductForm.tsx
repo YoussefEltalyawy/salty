@@ -3,20 +3,30 @@ import {type MappedProductOptions} from '@shopify/hydrogen';
 import type {
   Maybe,
   ProductOptionValueSwatch,
+  SelectedOption,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
+import {useVariantUrl} from '~/lib/variants';
+
+type ProductFormProps = {
+  /** The product's options and their values */
+  productOptions: MappedProductOptions[];
+  /** The currently selected variant */
+  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+  /** The product's handle */
+  productHandle: string;
+};
 
 export function ProductForm({
   productOptions,
   selectedVariant,
-}: {
-  productOptions: MappedProductOptions[];
-  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
-}) {
+  productHandle,
+}: ProductFormProps) {
   const navigate = useNavigate();
   const {open} = useAside();
+  const variantUrl = useVariantUrl(productHandle);
 
   return (
     <div className="space-y-6 font-poppins">
@@ -66,11 +76,20 @@ export function ProductForm({
                   return (
                     <Link
                       className={baseClassName}
-                      key={option.name + name}
+                      key={`${option.name}-${name}`}
                       prefetch="intent"
                       preventScrollReset
                       replace
-                      to={`/products/${handle}?${variantUriQuery}`}
+                      to={`${variantUrl}?${variantUriQuery}`}
+                      onClick={(e) => {
+                        // Only handle the click if the link is not already being handled
+                        if (e.defaultPrevented) return;
+                        e.preventDefault();
+                        navigate(`?${variantUriQuery}`, {
+                          replace: true,
+                          preventScrollReset: true,
+                        });
+                      }}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
@@ -81,7 +100,7 @@ export function ProductForm({
                   <button
                     type="button"
                     className={baseClassName}
-                    key={option.name + name}
+                    key={`${option.name}-${name}`}
                     disabled={!exists}
                     onClick={() => {
                       if (!selected) {
@@ -91,6 +110,8 @@ export function ProductForm({
                         });
                       }
                     }}
+                    aria-pressed={selected}
+                    aria-label={`Select ${name} ${option.name}`}
                   >
                     <ProductOptionSwatch swatch={swatch} name={name} />
                   </button>
@@ -123,13 +144,20 @@ export function ProductForm({
   );
 }
 
+type ProductOptionSwatchProps = {
+  /** The swatch data (color or image) */
+  swatch?: Maybe<ProductOptionValueSwatch> | undefined;
+  /** The display name of the option */
+  name: string;
+  /** Whether this swatch is currently selected */
+  isSelected?: boolean;
+};
+
 function ProductOptionSwatch({
   swatch,
   name,
-}: {
-  swatch?: Maybe<ProductOptionValueSwatch> | undefined;
-  name: string;
-}) {
+  isSelected = false,
+}: ProductOptionSwatchProps) {
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
 

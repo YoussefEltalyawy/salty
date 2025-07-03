@@ -1,4 +1,4 @@
-import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
 import {
   getPaginationVariables,
@@ -16,9 +16,16 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  const deferredData = loadDeferredData(args);
-  const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  // Load data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
+
+  return {
+    ...criticalData,
+    ...deferredData,
+  };
 }
 
 async function loadCriticalData({
@@ -47,7 +54,9 @@ async function loadCriticalData({
   return {collection};
 }
 
-function loadDeferredData({context}: LoaderFunctionArgs) {
+async function loadDeferredData({context}: LoaderFunctionArgs) {
+  // This function can be used to load any non-critical data
+  // that can be loaded after the initial page render
   return {};
 }
 
@@ -75,7 +84,7 @@ export default function Collection() {
 
         <PaginatedResourceSection
           connection={collection.products}
-          resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"
+          resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"
         >
           {({node: product, index}) => (
             <ProductItem

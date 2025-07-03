@@ -1,4 +1,4 @@
-import {defer, type LoaderFunctionArgs, redirect} from '@shopify/remix-oxygen';
+import {type LoaderFunctionArgs, redirect} from '@shopify/remix-oxygen';
 import {useLoaderData, type MetaFunction} from '@remix-run/react';
 
 interface PageData {
@@ -41,10 +41,10 @@ export async function loader(args: LoaderFunctionArgs) {
     loadDeferredData(args),
   ]);
 
-  return defer({
+  return {
     ...criticalData,
     ...deferredData,
-  });
+  };
 }
 
 /**
@@ -60,6 +60,7 @@ async function loadCriticalData({context, params}: LoaderFunctionArgs) {
   const {page} = await context.storefront.query<{page: PageData}>(PAGE_QUERY, {
     variables: {
       handle: params.handle,
+      language: context.storefront.i18n.language,
     },
   });
 
@@ -77,7 +78,7 @@ async function loadCriticalData({context, params}: LoaderFunctionArgs) {
  * Loads non-critical data that can be deferred
  * This function should never throw errors to prevent page crashes
  */
-function loadDeferredData({context}: LoaderFunctionArgs) {
+async function loadDeferredData({context}: LoaderFunctionArgs) {
   return {
     // Add deferred data properties here
   };
@@ -90,7 +91,7 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className=" mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
           {page.title}

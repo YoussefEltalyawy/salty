@@ -1,5 +1,5 @@
 import {useNonce, getShopAnalytics, Analytics} from '@shopify/hydrogen';
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {
   Links,
   Meta,
@@ -42,7 +42,6 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   formMethod,
   currentUrl,
   nextUrl,
-  defaultShouldRevalidate,
 }) => {
   // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') return true;
@@ -50,7 +49,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   // revalidate when manually revalidating via useRevalidator
   if (currentUrl.toString() === nextUrl.toString()) return true;
 
-  return defaultShouldRevalidate;
+  return false;
 };
 
 export function links() {
@@ -71,17 +70,18 @@ export function links() {
 }
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+  // Load all data in parallel
+  const [criticalData, deferredData] = await Promise.all([
+    loadCriticalData(args),
+    loadDeferredData(args),
+  ]);
 
   const {storefront, env} = args.context;
 
-  return defer({
-    ...deferredData,
+  // Combine all data into a single object
+  return {
     ...criticalData,
+    ...deferredData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
@@ -95,7 +95,7 @@ export async function loader(args: LoaderFunctionArgs) {
       country: args.context.storefront.i18n.country,
       language: args.context.storefront.i18n.language,
     },
-  });
+  };
 }
 
 /**
@@ -137,27 +137,36 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context}: LoaderFunctionArgs) {
+async function loadDeferredData({context}: LoaderFunctionArgs) {
   const {storefront, customerAccount, cart} = context;
 
-  // defer the footer query (below the fold)
-  const footer = storefront
-    .query(FOOTER_QUERY, {
-      cache: storefront.CacheLong(),
-      variables: {
-        footerMenuHandle: 'footer', // Adjust to your footer menu handle
-      },
-    })
-    .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
-  return {
-    cart: cart.get(),
-    isLoggedIn: customerAccount.isLoggedIn(),
-    footer,
-  };
+  try {
+    // Load footer data in parallel with other deferred data
+    const [footer, cartData, isLoggedIn] = await Promise.all([
+      storefront.query(FOOTER_QUERY, {
+        cache: storefront.CacheLong(),
+        variables: {
+          footerMenuHandle: 'footer',
+        },
+      }),
+      cart.get(),
+      customerAccount.isLoggedIn(),
+    ]);
+
+    return {
+      cart: cartData,
+      isLoggedIn,
+      footer,
+    };
+  } catch (error) {
+    // Log query errors, but don't throw them so the page can still render
+    console.error('Error in loadDeferredData:', error);
+    return {
+      cart: null,
+      isLoggedIn: false,
+      footer: null,
+    };
+  }
 }
 
 export function Layout({children}: {children?: React.ReactNode}) {

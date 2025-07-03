@@ -146,12 +146,12 @@ function ProductItem({
         </div>
 
         <div className="mt-6 space-y-1">
-          <h3 className="text-lg font-medium text-gray-900 group-hover:text-black transition-colors">
+          <h3 className="text-base  lg:text-lg text-gray-900 group-hover:text-black transition-colors">
             {product.title}
           </h3>
           <div className="flex items-center justify-between">
             <Money
-              className="text-lg font-medium text-gray-900"
+              className="text-base font-medium text-gray-800"
               data={product.priceRange.minVariantPrice}
             />
             <div className="h-0.5 w-0 bg-black group-hover:w-16 transition-all duration-300" />

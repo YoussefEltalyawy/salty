@@ -1,6 +1,6 @@
 import type {ProductVariantFragment} from 'storefrontapi.generated';
 import {Image} from '@shopify/hydrogen';
-import {useState} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import {ChevronLeft, ChevronRight, X} from 'lucide-react';
 type GalleryImage = {
   id?: string | null;
@@ -11,26 +11,40 @@ type GalleryImage = {
 };
 
 type ProductImageProps = {
-  selectedVariantImage: ProductVariantFragment['image'];
+  selectedVariantImage?: ProductVariantFragment['image'] | null;
   images: GalleryImage[];
 };
 
 function ProductImage({selectedVariantImage, images}: ProductImageProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [modalIndex, setModalIndex] = useState<number>(0);
-
   const [touchStart, setTouchStart] = useState<number>(0);
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  const allImages = selectedVariantImage
-    ? [
-        selectedVariantImage,
-        ...images.filter((img) => img.id !== selectedVariantImage.id),
-      ]
-    : images;
+  const allImages = useMemo(() => {
+    if (!selectedVariantImage) return images;
+    
+    // If selectedVariantImage is provided, make it the first image
+    const variantImageIndex = images.findIndex(
+      (img) => img.id === selectedVariantImage.id,
+    );
+    if (variantImageIndex === -1) {
+      return [selectedVariantImage, ...images];
+    }
+    
+    // If the variant image is already in the images array, move it to the front
+    const filteredImages = images.filter(
+      (_, index) => index !== variantImageIndex,
+    );
+    return [images[variantImageIndex], ...filteredImages];
+  }, [selectedVariantImage, images]);
+  
+  // Reset selected index when variant changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [selectedVariantImage?.id]);
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchStart(e.targetTouches[0].clientX);

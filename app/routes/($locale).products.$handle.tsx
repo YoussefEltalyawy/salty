@@ -136,7 +136,7 @@ export default function Product() {
                 width: node.width,
                 height: node.height,
               }))}
-              selectedVariantImage={undefined}
+              selectedVariantImage={selectedVariant?.image}
             />
           </div>
 

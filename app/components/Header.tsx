@@ -14,7 +14,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import {Menu, Search, ShoppingBag, User} from 'lucide-react';
+import {ChevronRight, Menu, Search, ShoppingBag, User} from 'lucide-react';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -134,32 +134,94 @@ export function HeaderMenu({
   const className = `header-menu-${viewport}`;
   const {close} = useAside();
 
-  return (
-    <nav className={className} role="navigation">
-      {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
-        if (!item.url) return null;
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
 
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
+  const toggleSubmenu = (itemId: string) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [itemId]: !prev[itemId],
+    }));
+  };
 
-        return (
+  const renderMenuItem = (item: any, depth = 0) => {
+    if (!item.url) return null;
+
+    const hasSubmenu = item.items?.length > 0;
+    const isSubmenuOpen = openSubmenus[item.id];
+    const url =
+      item.url.includes('myshopify.com') ||
+      item.url.includes(publicStoreDomain) ||
+      item.url.includes(primaryDomainUrl)
+        ? new URL(item.url).pathname
+        : item.url;
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (hasSubmenu) {
+        e.preventDefault();
+        toggleSubmenu(item.id);
+      } else {
+        close();
+      }
+    };
+
+    return (
+      <div key={item.id} className="w-full">
+        <div className="flex items-center justify-between w-full">
           <NavLink
-            className="header-menu-item"
+            className={`header-menu-item flex-1 ${
+              isSubmenuOpen ? 'active' : ''
+            }`}
             end
-            key={item.id}
-            onClick={close}
+            onClick={handleClick}
             prefetch="intent"
             style={activeLinkStyle}
             to={url}
           >
             {item.title}
           </NavLink>
-        );
-      })}
+
+          {hasSubmenu && (
+            <button
+              className="p-2 -mr-2 transition-transform duration-200"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleSubmenu(item.id);
+              }}
+              aria-expanded={isSubmenuOpen}
+              aria-label={`Toggle ${item.title} submenu`}
+            >
+              <ChevronRight
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  isSubmenuOpen ? 'rotate-90' : ''
+                }`}
+              />
+            </button>
+          )}
+        </div>
+
+        {hasSubmenu && (
+          <div
+            className={`submenu space-y-3 pl-4 transition-all duration-300 ease-in-out ${
+              isSubmenuOpen
+                ? 'max-h-screen opacity-100 mt-1'
+                : 'max-h-0 opacity-0'
+            }`}
+            style={{
+              visibility: isSubmenuOpen ? 'visible' : 'hidden',
+            }}
+          >
+            {item.items.map((subItem: any) =>
+              renderMenuItem(subItem, depth + 1),
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <nav className={`${className} space-y-1`} role="navigation">
+      {(menu || FALLBACK_HEADER_MENU).items.map(renderMenuItem)}
     </nav>
   );
 }
